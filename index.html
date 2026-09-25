@@ -478,12 +478,12 @@ img,svg{display:block;max-width:100%}
    new flag to SECTION_DEFS and any game carrying it slots in.
    ============================================================ */
 const GAMES = [
-  { id:"g01", title:"Iconicc Launcher", tagline:"Web Minecraft", desc:"Play Minecraft online unblocked.", url:"https://iconicclauncher.github.io/iconicclauncher/", image:"https://i.ibb.co/GyP2bf5/Untitled-design.png", tags:["Racing","Arcade"], platforms:["PC","Mobile"], hue:[18,100,54],
+  { id:"Iconicc-Launcher", title:"Iconicc Launcher", tagline:"Web Minecraft", desc:"Play Minecraft online unblocked.", url:"https://iconicclauncher.github.io/iconicclauncher/", image:"https://i.ibb.co/GyP2bf5/Untitled-design.png", tags:["Open World","Multiplayer"], platforms:["PC","Mobile","iOS"], hue:[18,100,54],
     isPopular:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
-  { id:"g02", title:"Hollow Signal", tagline:"Sci-fi horror", desc:"A relay station stopped answering six days ago. You're the one they sent to find out why, with a flashlight that's rated for eight hours and a shift that's rated for twelve.", url:"https://example.com/hollow-signal", image:"", tags:["Horror","Sci-Fi"], platforms:["PC","PlayStation"], hue:[265,60,42],
-    isPopular:true, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:true },
-  { id:"g03", title:"Copper & Rust", tagline:"Base builder", desc:"Strip a dead moon for parts, one refinery at a time, while something in the deep tunnels keeps rearranging the ore you already mapped.", url:"https://example.com/copper-and-rust", image:"", tags:["Strategy","Building"], platforms:["PC"], hue:[24,70,48],
-    isPopular:false, isTrending:false, isUpcoming:true, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:true, isOnSale:false, isExclusive:false },
+  { id:"g02", title:"Block Stacker", tagline:"A classic game.", desc:"Stack the blocks to beat your high score.", url:"https://codepen.io/HunorMarton/full/MWjBRWp", image:"", tags:["Classic","Timing"], platforms:["PC","Mobile","iOS"], hue:[265,60,42],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false, isCodepen:true },
+  { id:"g03", title:"Unblocked Games 6x", tagline:"The OG", desc:"A platform full of classic games.", url:"https://codepen.io/alexber233e444/full/QWoBNEW", image:"", tags:["Platform","Classic"], platforms:["PC","Mobile","iOS"], hue:[24,70,48],
+    isPopular:true, isTrending:true, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
   { id:"g04", title:"Ninefold Blade", tagline:"Action RPG", desc:"Nine weapons, nine endings, one very short window to figure out which one you're actually holding when the boss doors lock.", url:"https://example.com/ninefold-blade", image:"", tags:["RPG","Action"], platforms:["PC","Xbox","Switch"], hue:[0,72,46],
     isPopular:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:true, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
   { id:"g05", title:"Undertow", tagline:"Survival co-op", desc:"A flooded coastline, four fishing boats, and a tide that comes in twice as fast as the forecast says it should.", url:"https://example.com/undertow", image:"", tags:["Survival","Co-op"], platforms:["PC","PlayStation"], hue:[200,65,40],
@@ -517,6 +517,7 @@ const SECTION_DEFS = [
   { key:"isNew",             title:"New releases",        icon:"i-new" },
   { key:"isFree",            title:"Free to play",        icon:"i-grid" },
   { key:"isMultiplayer",     title:"Multiplayer",         icon:"i-grid" },
+   { key:"isCodepen",     title:"Codepen Games",         icon:"i-grid" },
   { key:"isOnSale",          title:"On sale",             icon:"i-flame" },
   { key:"isEarlyAccess",     title:"Early access",        icon:"i-clock" },
   { key:"isExclusive",       title:"cx exclusives",       icon:"i-new" },
