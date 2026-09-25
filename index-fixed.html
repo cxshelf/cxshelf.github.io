@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>cx</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   cx — design tokens
+   Outfit: a geometric, rounded-terminal sans that echoes the cx
+   mark's pill-shaped "c" and monoline "x" — used for the wordmark,
+   headlines and numerals, at confident weight rather than as a
+   pixel novelty face.
+   Plus Jakarta Sans: a warmer, slightly humanist workhorse for
+   body and UI text, paired to feel premium rather than default.
+   ============================================================ */
+:root{
+  --bg:#0A0A0B; --bg-2:#0F0F11; --surface:#161618; --surface-2:#1E1E21; --raised:#232326;
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.14);
+  --ink:#F3F3F1; --ink-2:#B9B9BE; --ink-3:#7C7C82; --ink-4:#4C4C51;
+  --orange-1:#E0895A; --orange-2:#C9683F; --orange-3:#EFB98F;
+  --grad-brand: linear-gradient(135deg, var(--orange-3) 0%, var(--orange-1) 48%, #A85333 100%);
+  --grad-fade: linear-gradient(180deg, transparent, var(--bg));
+  --good:#3DDC84; --gold:#E8B96A;
+  --r-lg:24px; --r-md:18px; --r-sm:11px; --r-pill:999px;
+  --sh:0 10px 30px rgba(0,0,0,.5);
+  --sh-orange:0 10px 30px rgba(201,104,63,.30);
+  --ease:cubic-bezier(.22,.9,.25,1);
+  --dur-fast:.16s; --dur:.32s; --dur-slow:.52s;
+  --font-display:"Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-body:"Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --nav-h:66px; --nav-gap:16px; --rail-w:0px;
+}
+:root[data-theme="light"]{
+  --bg:#F2F1EE; --bg-2:#EAE9E4; --surface:#FFFFFF; --surface-2:#F4F3EF; --raised:#FFFFFF;
+  --line:rgba(10,10,11,.10); --line-2:rgba(10,10,11,.16);
+  --ink:#131313; --ink-2:#4B4B4E; --ink-3:#83837E; --ink-4:#AFAFA9;
+  --grad-fade: linear-gradient(180deg, transparent, var(--bg));
+  --sh:0 10px 28px rgba(20,15,10,.14);
+  --sh-orange:0 8px 22px rgba(168,83,51,.20);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);
+  font-size:15.5px;line-height:1.5;letter-spacing:-.005em;-webkit-font-smoothing:antialiased;
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+button,input{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--orange-1);outline-offset:3px;border-radius:4px}
+img,svg{display:block;max-width:100%}
+.ico{width:1.2em;height:1.2em;flex:none}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+::selection{background:var(--orange-2);color:#fff}
+
+/* scrollbars, thin & dark */
+*{scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+::-webkit-scrollbar{height:8px;width:8px}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ── wordmark ── */
+.wordmark{font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:-.03em;line-height:1;
+  background:var(--grad-brand);-webkit-background-clip:text;background-clip:text;color:transparent;
+  display:inline-block;padding:2px 0}
+.wordmark.lg{font-size:40px}
+
+/* ============================================================
+   NAV — a single floating pill, detached from the page edge so
+   the hero's glow can bleed past its rounded ends rather than
+   stopping dead at a full-width bar. No profile control anywhere.
+   ============================================================ */
+.topbar{
+  position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:50;
+  display:flex;align-items:center;gap:18px;width:min(920px, calc(100% - 32px));
+  height:var(--nav-h);padding:0 10px 0 22px;border-radius:var(--r-pill);
+  background:var(--glass, rgba(22,22,24,.66));
+  backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.09);
+  box-shadow:0 14px 36px rgba(0,0,0,.35);
+}
+:root[data-theme="light"] .topbar{background:rgba(255,255,255,.72);border-color:rgba(10,10,11,.07);
+  box-shadow:0 14px 30px rgba(20,15,10,.12)}
+.topbar .links{position:relative;display:flex;align-items:center;gap:2px;flex:1}
+.nav-thumb{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:var(--r-pill);background:var(--raised);
+  z-index:0;transition:left var(--dur) var(--ease), width var(--dur) var(--ease)}
+.topbar .links a{position:relative;z-index:1}
+.topbar .links a{
+  padding:9px 16px;border-radius:var(--r-pill);font-size:14px;font-weight:600;color:var(--ink-3);
+  transition:color var(--dur-fast),background var(--dur-fast)
+}
+.topbar .links a:hover{color:var(--ink)}
+.topbar .links a.on{color:var(--ink)}
+.searchwrap.mobile-search{max-height:0;opacity:0;overflow:hidden;pointer-events:none;
+  transition:max-height .3s var(--ease), opacity .22s ease}
+.searchwrap.mobile-search.open{max-height:60px;opacity:1;pointer-events:auto}
+.searchwrap{position:relative;width:min(260px,26vw)}
+.searchwrap .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-3)}
+.searchwrap input{
+  width:100%;height:40px;padding:0 14px 0 40px;border-radius:var(--r-pill);border:1px solid var(--line);
+  background:var(--surface);font-size:14px;transition:border-color var(--dur-fast),background var(--dur-fast)
+}
+.searchwrap input:focus{outline:0;border-color:var(--orange-1);background:var(--raised)}
+.icobtn{
+  width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);
+  display:grid;place-items:center;cursor:pointer;color:var(--ink-2);flex:none;
+  transition:transform var(--dur-fast) var(--ease),border-color var(--dur-fast),color var(--dur-fast),background var(--dur-fast)
+}
+.icobtn:hover{color:var(--ink);border-color:var(--line-2)}
+.icobtn:active{transform:scale(.92)}
+.icobtn.brand{background:var(--grad-brand);border:0;color:#2A1206}
+
+/* mobile floating cluster (image-1 layout: 3 circles top-left) */
+.cluster{
+  position:fixed;top:calc(14px + env(safe-area-inset-top));left:14px;z-index:50;
+  display:none;gap:9px;
+}
+.cluster .icobtn{background:rgba(22,22,24,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-color:rgba(255,255,255,.12)}
+:root[data-theme="light"] .cluster .icobtn{background:rgba(255,255,255,.78);border-color:rgba(0,0,0,.08)}
+
+/* mobile bottom nav — also a detached floating pill, not an edge-to-edge bar */
+.bottomnav{
+  position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  z-index:50;display:none;gap:2px;padding:6px;border-radius:var(--r-pill);
+  background:rgba(22,22,24,.72);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 30px rgba(0,0,0,.4);
+}
+.nav-thumb-b{position:absolute;top:6px;bottom:6px;left:6px;width:0;border-radius:var(--r-pill);
+  background:rgba(224,137,90,.16);z-index:0;transition:left var(--dur) var(--ease), width var(--dur) var(--ease)}
+:root[data-theme="light"] .bottomnav{background:rgba(255,255,255,.82);border-color:rgba(10,10,11,.07);
+  box-shadow:0 12px 26px rgba(20,15,10,.14)}
+.bottomnav button{
+  position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:var(--ink-3);
+  cursor:pointer;font-size:10.5px;font-weight:600;padding:8px 18px;border-radius:var(--r-pill);
+  transition:color var(--dur-fast)
+}
+.bottomnav button.on{color:var(--orange-1)}
+.bottomnav button .ico{width:21px;height:21px}
+
+@media (max-width: 880px){
+  .topbar{display:none}
+  .cluster{display:flex}
+  .bottomnav{display:flex}
+  body{padding-bottom:0}
+}
+
+/* ============================================================
+   HERO — starts at the true top of the page (the nav floats over
+   it, out of flow) so the glow reaches y:0 and bleeds past the
+   pill's rounded ends instead of being sliced by an opaque bar.
+   ============================================================ */
+.hero{
+  position:relative;overflow:hidden;
+  padding:calc(var(--nav-h) + var(--nav-gap) + 40px) clamp(18px,4vw,44px) 40px;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:
+    radial-gradient(58% 64% at 88% -6%, rgba(201,104,63,.30), transparent 72%),
+    radial-gradient(46% 54% at 8% -4%, rgba(224,137,90,.16), transparent 68%);
+}
+@media (max-width: 880px){
+  .hero{ padding-top:calc(56px + env(safe-area-inset-top) + 34px) }
+}
+.hero h1{
+  font-family:var(--font-display);font-size:clamp(30px,4.6vw,52px);line-height:1.08;letter-spacing:.01em;
+  margin:0 0 14px;max-width:16ch
+}
+.hero p{margin:0;color:var(--ink-2);font-size:16px;max-width:52ch;line-height:1.6}
+.hero .stat-row{display:flex;gap:28px;margin-top:26px;flex-wrap:wrap}
+.hero .stat b{font-family:var(--font-display);font-size:22px;display:block;color:var(--orange-1)}
+.hero .stat span{font-size:12.5px;color:var(--ink-3)}
+
+/* ============================================================
+   SECTIONS — block grids, not horizontal scroll rows. Each one
+   fades/rises into place as it enters the viewport, and its tiles
+   stagger in behind it.
+   ============================================================ */
+.section{padding:26px clamp(18px,4vw,44px) 10px;opacity:0;transform:translateY(22px);
+  transition:opacity .6s var(--ease), transform .6s var(--ease)}
+.section.in{opacity:1;transform:none}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;gap:14px}
+.section-head h2{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0;display:flex;align-items:center;gap:9px}
+.section-head h2 .ico{width:18px;height:18px;color:var(--orange-1)}
+.section-head .count{font-size:12.5px;color:var(--ink-4);font-weight:500}
+.section-grid{
+  display:grid;gap:16px;
+  grid-template-columns:repeat(auto-fill, minmax(172px, 1fr));
+}
+.section.empty-guard:empty{display:none}
+
+/* ============================================================
+   TILE — hover slide/peel effect (from the Canva reference:
+   a duplicate offset behind the card, sliding to align on hover)
+   ============================================================ */
+.tile{
+  position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  opacity:0;transform:translateY(16px) scale(.97);
+  transition:opacity .45s var(--ease), transform .45s var(--ease);
+}
+.section.in .tile{opacity:1;transform:none}
+.tile .stackshadow{
+  position:absolute;inset:0;border-radius:var(--r-md);background:var(--grad-brand);
+  transform:translate(10px,10px);opacity:0;
+  transition:transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  z-index:0;
+}
+.tile .art{
+  position:relative;z-index:1;aspect-ratio:3/4;border-radius:var(--r-md);overflow:hidden;
+  background:var(--surface-2);border:1px solid var(--line);
+  transition:transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+.tile:hover .art, .tile:focus-visible .art{
+  transform:translate(-6px,-6px) rotate(-0.6deg);border-color:transparent;box-shadow:var(--sh-orange);
+}
+.tile:hover .stackshadow, .tile:focus-visible .stackshadow{opacity:.9;transform:translate(4px,4px)}
+.tile .art .bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center}
+.tile .art .bg img{width:100%;height:100%;object-fit:cover;display:block;
+  opacity:0;transition:opacity .35s ease}
+.tile .art .bg img.loaded{opacity:1}
+.tile .art .fade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.82) 100%)}
+.tile .art .mark{position:absolute;inset:0;z-index:0;display:grid;place-items:center;font-family:var(--font-display);
+  font-size:15px;color:rgba(255,255,255,.16);letter-spacing:.06em;padding:12px;text-align:center;line-height:1.5}
+.tile .art .body{position:relative;z-index:2;padding:12px}
+.tile .art .body b{display:block;font-size:14.5px;font-weight:700;letter-spacing:-.01em;color:#fff;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .art .body span{font-size:11.5px;color:rgba(255,255,255,.68)}
+.tile .badges{position:absolute;top:9px;left:9px;z-index:3;display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.tile .badge{
+  padding:4px 9px;border-radius:var(--r-pill);
+  font-size:9.5px;font-weight:700;letter-spacing:.03em;color:#1A0800;background:var(--gold)
+}
+.tile .badge.up{background:#8FD1FF;color:#052235}
+.tile .badge.new{background:var(--good);color:#052012}
+.tile .badge.sub{background:#fff;color:#1A0800}
+.tile .badge.trend{background:var(--orange-1);color:#2A1206}
+.tile .badge.free{background:#B7E3C7;color:#08331A}
+.tile .badge.sale{background:#E86B6B;color:#390808}
+.tile .badge.mp{background:#C9C2F5;color:#1B1440}
+.tile .badge.ea{background:#D8CFC0;color:#332A18}
+.tile .badge.new, .tile .badge.up{animation:badgeBreathe 2.6s ease-in-out infinite}
+@keyframes badgeBreathe{0%,100%{opacity:1}50%{opacity:.72}}
+.tile .fav-dot{
+  position:absolute;top:9px;right:9px;z-index:3;width:26px;height:26px;border-radius:50%;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;
+  opacity:0;transform:scale(.7);transition:opacity var(--dur-fast),transform var(--dur-fast) var(--ease)
+}
+.tile:hover .fav-dot{opacity:1;transform:scale(1)}
+.tile .fav-dot.on{opacity:1;transform:scale(1);color:var(--orange-1)}
+.tile .fav-dot .ico{width:14px;height:14px}
+.tile .fav-dot.pop{animation:favPop .42s var(--ease)}
+@keyframes favPop{0%{transform:scale(1)}40%{transform:scale(1.45)}70%{transform:scale(.88)}100%{transform:scale(1)}}
+
+
+/* ============================================================
+   DETAIL SCREEN — opens from a tile with a scale/origin transition
+   ============================================================ */
+.veil{position:fixed;inset:0;z-index:90;background:rgba(6,4,3,.7);backdrop-filter:blur(3px);
+  opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease)}
+.veil.on{opacity:1;pointer-events:auto}
+
+.detail{
+  position:fixed;z-index:91;inset:0;overflow-y:auto;background:var(--bg);
+  transform:scale(.92) translateY(28px);opacity:0;pointer-events:none;
+  transition:transform var(--dur-slow) var(--ease), opacity var(--dur) var(--ease);
+  transform-origin:var(--origin-x,50%) var(--origin-y,50%);
+}
+.detail.on{transform:none;opacity:1;pointer-events:auto}
+.detail .banner{position:relative;height:min(52vh,460px);overflow:hidden}
+.detail .banner .bg{position:absolute;inset:0}
+.detail .banner .fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%, var(--bg) 96%)}
+.detail .close{
+  position:absolute;top:calc(18px + env(safe-area-inset-top));right:18px;z-index:4;
+  width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);
+  border:0;color:#fff;display:grid;place-items:center;cursor:pointer
+}
+.detail .head-content{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 clamp(18px,4vw,54px) 22px}
+.detail .badges{display:flex;gap:8px;margin-bottom:12px}
+.detail h2{font-family:var(--font-display);font-size:clamp(26px,4.4vw,44px);margin:0 0 8px;line-height:1.1}
+.detail .meta{display:flex;gap:14px;flex-wrap:wrap;color:var(--ink-2);font-size:13.5px}
+.detail .body{padding:26px clamp(18px,4vw,54px) 70px;max-width:900px}
+.detail .body p{color:var(--ink-2);font-size:15.5px;line-height:1.7;max-width:68ch}
+.detail .actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 30px}
+.detail .platforms{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--r-pill);
+  background:var(--surface);border:1px solid var(--line);font-size:12.5px;color:var(--ink-2)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;height:50px;padding:0 26px;
+  border-radius:var(--r-pill);border:0;font-weight:700;font-size:15px;cursor:pointer;
+  transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast), background var(--dur-fast), color var(--dur-fast);
+}
+.btn:active{transform:scale(.965)}
+.btn .ico{width:19px;height:19px}
+.btn.play{background:var(--grad-brand);color:#1A0800;box-shadow:var(--sh-orange)}
+.btn.play:hover{box-shadow:0 12px 34px rgba(168,83,51,.42)}
+.btn.ghost{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--line-2)}
+.btn.ghost.active{color:var(--orange-1);border-color:rgba(224,137,90,.4);background:rgba(224,137,90,.1)}
+.btn.icon{width:50px;padding:0}
+
+/* ============================================================
+   REDIRECT TRANSITION
+   ============================================================ */
+.redirect{
+  position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity var(--dur-fast)
+}
+.redirect.on{opacity:1;pointer-events:auto}
+.redirect .sweep{position:absolute;inset:0;background:var(--grad-brand);clip-path:circle(0% at 50% 50%);
+  transition:clip-path var(--dur-slow) var(--ease)}
+.redirect.on .sweep{clip-path:circle(150% at 50% 50%)}
+.redirect .msg{position:relative;z-index:2;text-align:center;color:#1A0800;opacity:0;transition:opacity .2s ease .3s}
+.redirect.on .msg{opacity:1}
+.redirect .msg .wordmark{color:#1A0800;background:none;-webkit-text-fill-color:#1A0800}
+.redirect .msg p{margin:10px 0 0;font-size:13.5px;font-weight:600}
+.redirect .spin{width:28px;height:28px;border-radius:50%;border:3px solid rgba(26,8,0,.25);border-top-color:#1A0800;
+  margin:16px auto 0;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.icobtn .ico.flip{animation:iconFlip .42s var(--ease)}
+@keyframes iconFlip{0%{transform:rotate(0) scale(1)}50%{transform:rotate(160deg) scale(.5)}100%{transform:rotate(360deg) scale(1)}}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);z-index:120;
+  display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:var(--r-pill);
+  background:var(--raised);border:1px solid var(--line-2);box-shadow:var(--sh);font-size:14px;font-weight:600;
+  opacity:0;pointer-events:none;transition:opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease)
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast .ico{width:16px;height:16px;color:var(--orange-1)}
+
+.footer{padding:50px clamp(18px,4vw,44px) 40px;color:var(--ink-4);font-size:12.5px;display:flex;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;border-top:1px solid var(--line);margin-top:30px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.2 20.2l-3.9-3.9"/></symbol>
+<symbol id="i-spark" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.1 6.9L21 11l-6.9 2.1L12 20l-2.1-6.9L3 11l6.9-2.1z"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.9 19.8c.9-3.5 3.7-5.5 7.1-5.5s6.2 2 7.1 5.5"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4.2 10.4L12 4.4l7.8 6v8.4a1.5 1.5 0 01-1.5 1.5H5.7a1.5 1.5 0 01-1.5-1.5z"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3-3 4.5-3 8a3 3 0 006 0c1.4 1.2 2 2.8 2 4.4A5.4 5.4 0 0112 20a5.4 5.4 0 01-5-7.6C8 10 12 8 12 2z"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3.2 2"/></symbol>
+<symbol id="i-new" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.2 6.8H21l-5.6 4.1 2.2 6.9L12 15.7 6.4 19.8l2.2-6.9L3 8.8h6.8z"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.8" y="10.2" width="14.4" height="10.2" rx="3"/><path d="M8.4 10.2V7.8a3.6 3.6 0 017.2 0v2.4"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M7.4 4.8l11.4 7.2-11.4 7.2z"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 20.2S3.6 15.1 3.6 9.5a4.6 4.6 0 018.4-2.6A4.6 4.6 0 0120.4 9.5c0 5.6-8.4 10.7-8.4 10.7z"/></symbol>
+<symbol id="i-heart-fill" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 20.2S3.6 15.1 3.6 9.5a4.6 4.6 0 018.4-2.6A4.6 4.6 0 0120.4 9.5c0 5.6-8.4 10.7-8.4 10.7z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 5.4v13.2M5.4 12h13.2"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.4l5 5L19.5 7"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.2 6.2l11.6 11.6M17.8 6.2L6.2 17.8"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M20.4 14.2A8.6 8.6 0 019.8 3.6a8.6 8.6 0 1010.6 10.6z"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6.4" height="6.4" rx="1.6"/><rect x="13.6" y="4" width="6.4" height="6.4" rx="1.6"/><rect x="4" y="13.6" width="6.4" height="6.4" rx="1.6"/><rect x="13.6" y="13.6" width="6.4" height="6.4" rx="1.6"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.6 6.4h14.8M4.6 12h14.8M4.6 17.6h14.8"/></symbol>
+<symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 12A8.4 8.4 0 1112 3.6c2.6 0 4.9 1.2 6.4 3"/><path d="M18.4 3v4.6h-4.6M12 7.6V12l3 1.8"/></symbol>
+<symbol id="i-vol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M11 5.2L6.6 9H3.4v6h3.2L11 18.8z"/><path d="M15.4 9.2a4 4 0 010 5.6M18.2 6.4a8 8 0 010 11.2"/></symbol>
+<symbol id="i-vol-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M11 5.2L6.6 9H3.4v6h3.2L11 18.8z"/><path d="M16 9.6l4.6 4.8M20.6 9.6L16 14.4"/></symbol>
+</defs>
+</svg>
+
+<!-- ══ topbar (desktop) + floating cluster (mobile) ══ -->
+<header class="topbar">
+  <span class="wordmark" style="margin-right:6px">cx</span>
+  <nav class="links" id="navLinks">
+    <span class="nav-thumb" id="navThumb" aria-hidden="true"></span>
+    <a href="#" data-nav="home" class="on">Home</a>
+    <a href="#" data-nav="favorites">Favorites</a>
+    <a href="#" data-nav="playlist">Playlist</a>
+  </nav>
+  <div class="searchwrap">
+    <svg class="ico"><use href="#i-search"/></svg>
+    <input id="searchInput" placeholder="Search games" autocomplete="off">
+  </div>
+  <button class="icobtn" id="themeBtn" aria-label="Toggle theme"><svg class="ico"><use href="#i-moon"/></svg></button>
+  <button class="icobtn" id="soundBtn" aria-label="Toggle sound"><svg class="ico"><use href="#i-vol"/></svg></button>
+</header>
+
+<div class="cluster">
+  <button class="icobtn" id="clusterHome" aria-label="Home"><svg class="ico"><use href="#i-home"/></svg></button>
+  <button class="icobtn" id="clusterTheme" aria-label="Toggle theme"><svg class="ico"><use href="#i-moon"/></svg></button>
+  <button class="icobtn" id="clusterSound" aria-label="Toggle sound"><svg class="ico"><use href="#i-vol"/></svg></button>
+  <button class="icobtn" id="clusterSearch" aria-label="Search"><svg class="ico"><use href="#i-search"/></svg></button>
+</div>
+
+<!-- inline mobile search bar, shown when cluster search tapped -->
+<div class="searchwrap mobile-search" id="mobileSearchWrap" style="position:fixed;top:calc(64px + env(safe-area-inset-top));left:14px;right:14px;z-index:49;width:auto">
+  <svg class="ico"><use href="#i-search"/></svg>
+  <input id="mobileSearchInput" placeholder="Search games" autocomplete="off">
+</div>
+
+<main id="main">
+  <section class="hero">
+    <h1>Every game.<br>One shelf.</h1>
+    <p>cx pulls together what's popular, what's coming, and what you're already playing — one clean row at a time, cached right here in your browser.</p>
+    <div class="stat-row" id="heroStats"></div>
+  </section>
+
+  <div id="rows"></div>
+
+  <footer class="footer">
+    <span>cx — a games shelf, not a store.</span>
+    <span id="clockOut"></span>
+  </footer>
+</main>
+
+<nav class="bottomnav">
+  <span class="nav-thumb-b" id="navThumbB" aria-hidden="true"></span>
+  <button data-nav="home" class="on"><svg class="ico"><use href="#i-home"/></svg>Home</button>
+  <button data-nav="favorites"><svg class="ico"><use href="#i-heart"/></svg>Favorites</button>
+  <button data-nav="playlist"><svg class="ico"><use href="#i-list"/></svg>Playlist</button>
+</nav>
+
+<!-- ══ detail screen ══ -->
+<div class="veil" id="veil"></div>
+<div class="detail" id="detail">
+  <div class="banner">
+    <div class="bg" id="detailBg"></div>
+    <div class="fade"></div>
+    <button class="close" id="detailClose" aria-label="Close"><svg class="ico"><use href="#i-close"/></svg></button>
+    <div class="head-content">
+      <div class="badges" id="detailBadges"></div>
+      <h2 id="detailTitle"></h2>
+      <div class="meta" id="detailMeta"></div>
+    </div>
+  </div>
+  <div class="body">
+    <p id="detailDesc"></p>
+    <div class="actions">
+      <button class="btn play" id="detailPlay"><svg class="ico"><use href="#i-play"/></svg>Play</button>
+      <button class="btn ghost" id="detailFav"><svg class="ico"><use href="#i-heart"/></svg>Favorite</button>
+      <button class="btn ghost" id="detailList"><svg class="ico"><use href="#i-plus"/></svg>Add to playlist</button>
+    </div>
+    <div class="platforms" id="detailPlatforms"></div>
+  </div>
+</div>
+
+<!-- ══ redirect transition ══ -->
+<div class="redirect" id="redirect">
+  <div class="sweep"></div>
+  <div class="msg">
+    <span class="wordmark lg">cx</span>
+    <p id="redirectLabel">Launching…</p>
+    <div class="spin"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><svg class="ico"><use href="#i-check"/></svg><span></span></div>
+
+<script>
+"use strict";
+/* ============================================================
+   cx — data model
+   Every game is a plain object. `image` is a URL (or a data: URI)
+   for real box art — leave it "" to keep the generated gradient
+   mark. NOTE: published cx pages can only load images from a data:
+   URI or the handful of allowed script/font hosts; a normal
+   https:// image URL from a random site will not load here (the
+   page's content security policy blocks remote images), so the
+   tile always falls back to the gradient mark on load failure —
+   nothing ever breaks or shows a broken-image icon.
+
+   Every other property is a plain true/false parameter. Sections
+   further down are generated straight off these booleans — add a
+   new flag to SECTION_DEFS and any game carrying it slots in.
+   ============================================================ */
+const GAMES = [
+  { id:"Iconicc-Launcher", title:"Iconicc Launcher", tagline:"Web Minecraft", desc:"Play Minecraft online unblocked.", url:"https://iconicclauncher.github.io/iconicclauncher/", image:"https://i.ibb.co/GyP2bf5/Untitled-design.png", tags:["Open World","Multiplayer"], platforms:["PC","Mobile","iOS"], hue:[18,100,54],
+    isPopular:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"Stack", title:"Block Stacker", tagline:"A classic game.", desc:"Stack the blocks to beat your high score.", url:"https://codepen.io/HunorMarton/full/MWjBRWp", image:"https://i.ibb.co/NdfV4khV/Stack.png", tags:["Classic","Timing"], platforms:["PC","Mobile","iOS"], hue:[265,60,42],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false, isCodepen:true },
+  { id:"Menja", title:"Menja", tagline:"Slice it.", desc:"Fruit ninja, but with blocks.", url:"https://menja.cmiller.tech/", image:"https://i.ibb.co/XrqKHstx/8f4a24b081ff1f42.jpg", tags:["Endles","Classic"], platforms:["PC","Mobile","iOS"], hue:[24,70,48],
+    isPopular:false, isTrending:true, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"Pokedex", title:"Pokedex", tagline:"Pokemon info on the web.", desc:"Check out all your pokemon stats.", url:"https://masa-pokedex.netlify.app/", image:"https://i.ibb.co/kg3fM4xr/s-l1200.png", tags:["Tool","Utilities"], platforms:["All"], hue:[0,72,46],
+    isPopular:false, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"OvO", title:"OvO", tagline:"The original unblocked games platformer.", desc:"Jump around and dodge obsticals.", url:"https://ovo.drakeerv.com/versions/1.4.4b/", image:"https://i.ibb.co/zVD6tfTb/unnamed.png", tags:["Platformer","OG"], platforms:["PC","Mobile","iOS"], hue:[200,65,40],
+    isPopular:false, isTrending:true, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"Helix", title:"Helix Jump", tagline:"Avoid the red", desc:"A fast-paced arcade game where you control a bouncing ball through a twisting tower, breaking through platforms and avoiding obstacles to reach the bottom.", url:"https://schoolpower.pages.dev/helix", image:"https://i.ibb.co/S401gsvb/cover-16x9-1733222901873.avif", tags:["Endless"], platforms:["All"], hue:[30,55,42],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"Cat", title:"Catblob", tagline:"Pac-Cat", desc:"A fun arcade maze game where you play as a hungry cat, collect treats, and dodge mischievous dogs chasing you through the maze.", url:"https://ma5a.com/catblob/", image:"https://i.ibb.co/PZkKbJd8/title.jpg", tags:["Cats","Endless"], platforms:["PC","Mobile"], hue:[280,45,52],
+    isPopular:false, isTrending:true, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"Apple", title:"Apple Shooter", tagline:"Shoot the apple", desc:"A tense precision game where you shoot an apple off a character’s head, carefully aiming each shot without hitting them.", url:"https://codepen.io/alexber233e444/full/NWJLZvN", image:"https://i.ibb.co/mC3PnjhL/cover-16x9-1711357016265.avif", tags:["Precision","Meme"], platforms:["PC"], hue:[12,80,50],
+    isPopular:false, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g09", title:"Ashgrove", tagline:"Roguelike deckbuilder", desc:"Every run burns the forest down a little more. Eventually there's nothing left to hide in, which was rather the point.", url:"https://example.com/ashgrove", image:"", tags:["Roguelike","Cards"], platforms:["PC","Switch"], hue:[8,68,42],
+    isPopular:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:true, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g10", title:"Payload Zero", tagline:"Tactical shooter", desc:"Six-person squads, one shared radio channel, and a scoring system that punishes anyone who fires before the countdown hits zero.", url:"https://example.com/payload-zero", image:"", tags:["Shooter","Tactical"], platforms:["PC","Xbox"], hue:[210,20,32],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:true, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g11", title:"Paperweight", tagline:"Narrative adventure", desc:"You inherit a dead uncle's apartment and, it turns out, his unfinished argument with everyone in the building.", url:"https://example.com/paperweight", image:"", tags:["Narrative","Indie"], platforms:["PC","Switch"], hue:[40,50,50],
+    isPopular:false, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:true },
+  { id:"g12", title:"Ironclad Ledger", tagline:"Trading strategy", desc:"Run a merchant fleet through three warring ports without ever technically taking a side — a promise that gets harder every season.", url:"https://example.com/ironclad-ledger", image:"", tags:["Strategy","Trading"], platforms:["PC"], hue:[45,60,42],
+    isPopular:false, isTrending:false, isUpcoming:true, isNew:false, isSubscribersOnly:true, isFree:false, isMultiplayer:false, isEarlyAccess:true, isOnSale:false, isExclusive:false },
+  { id:"g13", title:"Fen & Fable", tagline:"Cozy sim", desc:"A swamp cottage, a leaky roof, and neighbors who are all, technically, folklore made flesh and mildly annoyed about the leak too.", url:"https://example.com/fen-and-fable", image:"", tags:["Cozy","Sim"], platforms:["PC","Switch"], hue:[150,40,42],
+    isPopular:false, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:true, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g14", title:"Deadhand", tagline:"Western shooter", desc:"A bounty board that updates in real time, a revolver that jams if you clean it wrong, and a town that remembers exactly who you shot.", url:"https://example.com/deadhand", image:"", tags:["Western","Shooter"], platforms:["PC","PlayStation"], hue:[22,62,38],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:true, isExclusive:false }
+];
+
+/* Which boolean drives which section, in display order (skipped
+   entirely if zero games currently carry that flag). */
+const SECTION_DEFS = [
+  { key:"isTrending",        title:"Trending now",       icon:"i-flame" },
+  { key:"isPopular",         title:"Popular",             icon:"i-flame" },
+  { key:"isUpcoming",        title:"Up and coming",       icon:"i-clock" },
+  { key:"isNew",             title:"New releases",        icon:"i-new" },
+  { key:"isFree",            title:"Free to play",        icon:"i-grid" },
+  { key:"isMultiplayer",     title:"Multiplayer",         icon:"i-grid" },
+   { key:"isCodepen",     title:"Codepen Games",         icon:"i-grid" },
+  { key:"isOnSale",          title:"On sale",             icon:"i-flame" },
+  { key:"isEarlyAccess",     title:"Early access",        icon:"i-clock" },
+  { key:"isExclusive",       title:"cx exclusives",       icon:"i-new" },
+  { key:"isSubscribersOnly", title:"Subscribers only",    icon:"i-lock" }
+];
+
+/* ============================================================
+   storage — everything here caches in the browser only
+   ============================================================ */
+const STORE_KEY = "cx:state:v1";
+function loadState(){
+  try { return Object.assign({ favorites:[], playlist:[], recent:[], theme:null, muted:false }, JSON.parse(localStorage.getItem(STORE_KEY) || "{}")); }
+  catch(e){ return { favorites:[], playlist:[], recent:[], theme:null, muted:false }; }
+}
+function saveState(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e){} }
+let state = loadState();
+
+function byId(id){ return GAMES.find(g => g.id === id); }
+function toggleSet(key, id){
+  const i = state[key].indexOf(id);
+  if (i === -1) state[key].push(id); else state[key].splice(i, 1);
+  saveState();
+  return i === -1;
+}
+function pushRecent(id){
+  state.recent = state.recent.filter(x => x !== id);
+  state.recent.unshift(id);
+  state.recent = state.recent.slice(0, 12);
+  saveState();
+}
+
+/* ============================================================
+   render helpers
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+function el(tag, cls, txt){ const n = document.createElement(tag); if(cls) n.className = cls; if(txt != null) n.textContent = txt; return n; }
+function icon(id){ const s = document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("class","ico"); const u = document.createElementNS("http://www.w3.org/2000/svg","use"); u.setAttribute("href","#"+id); s.appendChild(u); return s; }
+function artGradient(hue){
+  const [h,s,l] = hue;
+  return `linear-gradient(150deg, hsl(${h} ${s}% ${Math.min(l+18,70)}%), hsl(${h} ${Math.max(s-8,10)}% ${Math.max(l-16,8)}%) 70%)`;
+}
+function initials(title){ return title.split(" ").map(w=>w[0]).join("").slice(0,3).toUpperCase(); }
+
+/* ============================================================
+   sound — a handful of short synthesized tones, generated on the
+   fly with the Web Audio API. No audio files are loaded (a
+   published page can't fetch remote media anyway), so this never
+   has anything to fail to load. Muted until the first tap/click,
+   per browser autoplay rules, then stays on for the session
+   (toggle lives in localStorage under the same state blob).
+   ============================================================ */
+const Sound = (() => {
+  let ctx = null;
+  function ensure(){ if (!ctx){ try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} } return ctx; }
+  function tone(freq, dur, opts){
+    const o = opts || {};
+    const c = ensure(); if (!c || state.muted) return;
+    if (c.state === "suspended") c.resume();
+    const t0 = c.currentTime;
+    const osc = c.createOscillator(); const gain = c.createGain();
+    osc.type = o.wave || "sine";
+    osc.frequency.setValueAtTime(freq, t0);
+    if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t0 + dur);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(o.vol || 0.09, t0 + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(gain); gain.connect(c.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  }
+  const RECIPES = {
+    nav:      () => tone(520, .09, { wave:"triangle", to:640, vol:.07 }),
+    fav_on:   () => { tone(660, .1, { wave:"sine", to:880, vol:.09 }); setTimeout(()=>tone(990,.08,{wave:"sine",vol:.06}),55); },
+    fav_off:  () => tone(420, .09, { wave:"sine", to:300, vol:.06 }),
+    open:     () => tone(300, .16, { wave:"sine", to:520, vol:.08 }),
+    launch:   () => { tone(340,.14,{wave:"triangle",to:220,vol:.09}); setTimeout(()=>tone(680,.18,{wave:"sine",to:920,vol:.08}),90); },
+    click:    () => tone(700, .05, { wave:"square", vol:.035 })
+  };
+  return { play(name){ const fn = RECIPES[name]; if (fn) fn(); } };
+})();
+function sfx(name){ Sound.play(name); }
+
+function tileNode(game){
+  const t = el("article","tile");
+  t.tabIndex = 0; t.dataset.id = game.id;
+  const shadow = el("div","stackshadow");
+  const art = el("div","art");
+  const bg = el("div","bg"); bg.style.background = artGradient(game.hue);
+  if (game.image){
+    const img = new Image();
+    img.alt = ""; img.loading = "lazy";
+    img.addEventListener("load", () => img.classList.add("loaded"));
+    img.addEventListener("error", () => img.remove()); // silently falls back to the gradient + mark
+    img.src = game.image;
+    bg.appendChild(img);
+  }
+  const mark = el("div","mark", initials(game.title));
+  const fade = el("div","fade");
+  const body = el("div","body");
+  body.append(el("b",null,game.title), el("span",null,game.tagline));
+  art.append(bg, mark, fade, body);
+
+  const badgeDefs = [
+    [game.isNew, "New", "new"], [game.isTrending, "Trending", "trend"],
+    [game.isUpcoming, "Coming soon", "up"], [game.isOnSale, "On sale", "sale"],
+    [game.isFree, "Free", "free"], [game.isMultiplayer, "Multiplayer", "mp"],
+    [game.isEarlyAccess, "Early access", "ea"], [game.isSubscribersOnly, "Subscribers", "sub"]
+  ].filter(b => b[0]).slice(0, 2);
+  if (badgeDefs.length){
+    const stack = el("div","badges");
+    badgeDefs.forEach(([,label,cls]) => stack.appendChild(el("span","badge "+cls,label)));
+    art.appendChild(stack);
+  }
+
+  const fav = el("button","fav-dot" + (state.favorites.includes(game.id) ? " on" : ""));
+  fav.setAttribute("aria-label","Toggle favorite");
+  fav.appendChild(icon(state.favorites.includes(game.id) ? "i-heart-fill" : "i-heart"));
+  fav.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const on = toggleSet("favorites", game.id);
+    fav.classList.toggle("on", on);
+    fav.innerHTML = ""; fav.appendChild(icon(on ? "i-heart-fill" : "i-heart"));
+    fav.classList.remove("pop"); void fav.offsetWidth; fav.classList.add("pop");
+    sfx(on ? "fav_on" : "fav_off");
+    toast(on ? "Added to favorites" : "Removed from favorites");
+    if (state.route === "favorites") renderRoute();
+  });
+
+  t.append(shadow, art, fav);
+  t.addEventListener("click", () => openDetail(game, t));
+  t.addEventListener("keydown", (e) => { if (e.key === "Enter") openDetail(game, t); });
+  return t;
+}
+
+/* a section is a titled block of tiles laid out in a responsive
+   grid — no horizontal scrolling. Returns null (and is skipped)
+   when there is nothing to put in it. */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add("in"); revealObserver.unobserve(en.target); } });
+}, { threshold: .12 });
+
+function section(title, iconId, games){
+  if (!games.length) return null;
+  const wrap = el("section","section empty-guard");
+  const head = el("div","section-head");
+  const h2 = el("h2"); h2.append(icon(iconId), document.createTextNode(title));
+  head.append(h2, el("span","count", games.length + " title" + (games.length===1?"":"s")));
+  const grid = el("div","section-grid");
+  games.forEach((g,i) => { const tile = tileNode(g); tile.style.transitionDelay = Math.min(i,8)*35 + "ms"; grid.appendChild(tile); });
+  wrap.append(head, grid);
+  revealObserver.observe(wrap);
+  return wrap;
+}
+
+/* ============================================================
+   routing — home / favorites / playlist, all client-side
+   ============================================================ */
+state.route = "home";
+function renderRoute(){
+  const rows = $("#rows"); rows.innerHTML = "";
+  $$(".hero").forEach(h => h.style.display = state.route === "home" ? "" : "none");
+  $$("[data-nav]").forEach(n => n.classList.toggle("on", n.dataset.nav === state.route));
+  syncNavThumbs();
+
+  if (state.route === "favorites"){
+    const games = state.favorites.map(byId).filter(Boolean);
+    rows.appendChild(section("Your favorites", "i-heart", games) || emptyNote("No favorites yet. Tap the heart on any tile to add one."));
+    return;
+  }
+  if (state.route === "playlist"){
+    const games = state.playlist.map(byId).filter(Boolean);
+    rows.appendChild(section("Your playlist", "i-list", games) || emptyNote("Your playlist is empty. Open a game and add it from there."));
+    return;
+  }
+
+  // home: recent, favorites, playlist, then every flagged section — each hidden if empty
+  const recentGames = state.recent.map(byId).filter(Boolean);
+  const favGames = state.favorites.map(byId).filter(Boolean);
+  const listGames = state.playlist.map(byId).filter(Boolean);
+  const blocks = [
+    section("Continue playing", "i-history", recentGames),
+    section("Your favorites", "i-heart", favGames),
+    section("Your playlist", "i-list", listGames),
+    ...SECTION_DEFS.map(def => section(def.title, def.icon, GAMES.filter(g => g[def.key])))
+  ];
+  blocks.filter(Boolean).forEach(s => rows.appendChild(s));
+  renderHeroStats();
+}
+function emptyNote(msg){
+  const p = el("p", null, msg);
+  p.style.cssText = "padding:60px clamp(18px,4vw,44px);color:var(--ink-3);font-size:15px;max-width:44ch";
+  return p;
+}
+function countUp(node, target){
+  const start = 0, dur = 700, t0 = performance.now();
+  function tick(t){
+    const p = Math.min(1, (t - t0) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    node.textContent = Math.round(start + (target - start) * eased);
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+function renderHeroStats(){
+  const wrap = $("#heroStats"); wrap.innerHTML = "";
+  const stats = [
+    [GAMES.length, "games on the shelf"],
+    [state.favorites.length, "in your favorites"],
+    [state.playlist.length, "in your playlist"]
+  ];
+  stats.forEach(([n,l]) => {
+    const d = el("div","stat"); const b = el("b",null,"0");
+    d.append(b, el("span",null,l)); wrap.appendChild(d);
+    countUp(b, n);
+  });
+}
+
+function goRoute(r){
+  if (r === state.route) return;
+  sfx("nav");
+  state.route = r;
+  const q = $("#searchInput"); if(q) q.value="";
+  const mq = $("#mobileSearchInput"); if(mq) mq.value="";
+  const rows = $("#rows");
+  rows.style.transition = "opacity .16s ease, transform .16s ease";
+  rows.style.opacity = "0"; rows.style.transform = "translateY(6px)";
+  setTimeout(() => {
+    renderRoute();
+    requestAnimationFrame(() => { rows.style.opacity = "1"; rows.style.transform = "none"; });
+  }, 140);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$$("[data-nav]").forEach(n => n.addEventListener("click", (e) => { e.preventDefault(); goRoute(n.dataset.nav); }));
+$("#clusterHome").addEventListener("click", () => goRoute("home"));
+
+function syncNavThumbs(){
+  const onLink = $("#navLinks .on"); const thumb = $("#navThumb");
+  if (onLink && thumb){ thumb.style.left = onLink.offsetLeft + "px"; thumb.style.width = onLink.offsetWidth + "px"; }
+  const onBtn = $(".bottomnav .on"); const thumbB = $("#navThumbB");
+  if (onBtn && thumbB){ thumbB.style.left = onBtn.offsetLeft + "px"; thumbB.style.width = onBtn.offsetWidth + "px"; }
+}
+addEventListener("resize", syncNavThumbs);
+
+/* ============================================================
+   search (desktop inline + mobile toggle)
+   ============================================================ */
+function renderRouteWithQuery(q){
+  const rows = $("#rows"); rows.innerHTML = "";
+  if (!q){ renderRoute(); return; }
+  $$(".hero").forEach(h => h.style.display = "none");
+  const pool = GAMES.filter(g => g.title.toLowerCase().includes(q) || g.tags.some(t=>t.toLowerCase().includes(q)) || g.tagline.toLowerCase().includes(q));
+  const s = section("Results for \u201c" + q + "\u201d", "i-search", pool);
+  rows.appendChild(s || emptyNote("Nothing matches \u201c" + q + "\u201d."));
+}
+$("#searchInput").addEventListener("input", (e) => renderRouteWithQuery(e.target.value.toLowerCase()));
+$("#mobileSearchInput").addEventListener("input", (e) => renderRouteWithQuery(e.target.value.toLowerCase()));
+$("#clusterSearch").addEventListener("click", () => {
+  const w = $("#mobileSearchWrap");
+  const showing = w.classList.contains("open");
+  w.classList.toggle("open", !showing);
+  sfx("nav");
+  if (!showing) setTimeout(() => $("#mobileSearchInput").focus(), 220);
+  else { $("#mobileSearchInput").value = ""; renderRouteWithQuery(""); }
+});
+
+/* ============================================================
+   detail screen — scale transition anchored at the clicked tile
+   ============================================================ */
+let currentGame = null;
+function openDetail(game, tileEl){
+  currentGame = game;
+  const rect = tileEl.getBoundingClientRect();
+  const ox = ((rect.left + rect.width/2) / innerWidth) * 100;
+  const oy = ((rect.top + rect.height/2) / innerHeight) * 100;
+  const d = $("#detail");
+  d.style.setProperty("--origin-x", ox + "%");
+  d.style.setProperty("--origin-y", oy + "%");
+
+  $("#detailBg").style.background = artGradient(game.hue);
+  $("#detailTitle").textContent = game.title;
+  const badges = $("#detailBadges"); badges.innerHTML = "";
+  [
+    [game.isTrending,"Trending","badge trend"], [game.isPopular,"Popular","badge"],
+    [game.isUpcoming,"Coming soon","badge up"], [game.isNew,"New","badge new"],
+    [game.isOnSale,"On sale","badge sale"], [game.isFree,"Free","badge free"],
+    [game.isMultiplayer,"Multiplayer","badge mp"], [game.isEarlyAccess,"Early access","badge ea"],
+    [game.isExclusive,"cx exclusive","badge trend"], [game.isSubscribersOnly,"Subscribers only","badge sub"]
+  ].forEach(([cond,label,cls]) => { if(cond){ const b = el("span",cls,label); b.style.position="static"; badges.appendChild(b); } });
+
+  const meta = $("#detailMeta"); meta.innerHTML = "";
+  meta.append(el("span",null,game.tagline), el("span",null,"\u00b7"), el("span",null,game.tags.join(", ")));
+  $("#detailDesc").textContent = game.desc;
+
+  const plat = $("#detailPlatforms"); plat.innerHTML = "";
+  game.platforms.forEach(p => plat.appendChild(el("span","chip",p)));
+
+  syncDetailButtons();
+
+  $("#veil").classList.add("on");
+  d.classList.add("on");
+  document.body.style.overflow = "hidden";
+  history.pushState({ cx:"detail" }, "", "#" + game.id);
+  sfx("open");
+}
+function syncDetailButtons(){
+  const favBtn = $("#detailFav"), listBtn = $("#detailList");
+  const isFav = state.favorites.includes(currentGame.id);
+  const isListed = state.playlist.includes(currentGame.id);
+  favBtn.classList.toggle("active", isFav);
+  favBtn.innerHTML = ""; favBtn.appendChild(icon(isFav ? "i-heart-fill" : "i-heart"));
+  favBtn.append(document.createTextNode(isFav ? "Favorited" : "Favorite"));
+  listBtn.classList.toggle("active", isListed);
+  listBtn.innerHTML = ""; listBtn.appendChild(icon(isListed ? "i-check" : "i-plus"));
+  listBtn.append(document.createTextNode(isListed ? "In playlist" : "Add to playlist"));
+}
+function closeDetail(){
+  $("#veil").classList.remove("on");
+  $("#detail").classList.remove("on");
+  document.body.style.overflow = "";
+  if (location.hash) history.back();
+}
+$("#detailClose").addEventListener("click", closeDetail);
+$("#veil").addEventListener("click", closeDetail);
+addEventListener("keydown", (e) => { if (e.key === "Escape" && $("#detail").classList.contains("on")) closeDetail(); });
+addEventListener("popstate", () => { if ($("#detail").classList.contains("on")) { $("#veil").classList.remove("on"); $("#detail").classList.remove("on"); document.body.style.overflow=""; } });
+
+$("#detailFav").addEventListener("click", () => {
+  const on = toggleSet("favorites", currentGame.id);
+  syncDetailButtons();
+  sfx(on ? "fav_on" : "fav_off");
+  toast(on ? "Added to favorites" : "Removed from favorites");
+});
+$("#detailList").addEventListener("click", () => {
+  const on = toggleSet("playlist", currentGame.id);
+  syncDetailButtons();
+  sfx(on ? "fav_on" : "fav_off");
+  toast(on ? "Added to playlist" : "Removed from playlist");
+});
+$("#detailPlay").addEventListener("click", () => { sfx("launch"); launch(currentGame); });
+
+/* ============================================================
+   launch / redirect transition
+   ============================================================ */
+function launch(game){
+  pushRecent(game.id);
+  const r = $("#redirect");
+  $("#redirectLabel").textContent = "Launching " + game.title + "\u2026";
+  r.classList.add("on");
+  setTimeout(() => {
+    window.open(game.url, "_blank", "noopener");
+    setTimeout(() => { r.classList.remove("on"); closeDetail(); renderRoute(); }, 260);
+  }, 620);
+}
+
+/* ============================================================
+   toast
+   ============================================================ */
+let toastT;
+function toast(msg){
+  const t = $("#toast");
+  $("span", t).textContent = msg;
+  t.classList.add("on");
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove("on"), 2200);
+}
+
+/* ============================================================
+   theme — dark/light, auto-detect + manual override, cached
+   ============================================================ */
+function applyTheme(mode){
+  document.documentElement.dataset.theme = mode;
+  $$("#themeBtn .ico use, #clusterTheme .ico use").forEach(u => u.setAttribute("href", mode === "light" ? "#i-sun" : "#i-moon"));
+  state.theme = mode; saveState();
+}
+function initTheme(){
+  const preferred = state.theme || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+  applyTheme(preferred);
+}
+function toggleTheme(){
+  sfx("nav");
+  $$("#themeBtn .ico, #clusterTheme .ico").forEach(i => { i.classList.remove("flip"); void i.offsetWidth; i.classList.add("flip"); });
+  applyTheme((document.documentElement.dataset.theme === "light") ? "dark" : "light");
+}
+$("#themeBtn").addEventListener("click", toggleTheme);
+$("#clusterTheme").addEventListener("click", toggleTheme);
+
+function applySoundIcon(){
+  $$("#soundBtn .ico use, #clusterSound .ico use").forEach(u => u.setAttribute("href", state.muted ? "#i-vol-off" : "#i-vol"));
+}
+function toggleSound(){
+  state.muted = !state.muted; saveState(); applySoundIcon();
+  if (!state.muted) sfx("nav");
+}
+$("#soundBtn").addEventListener("click", toggleSound);
+$("#clusterSound").addEventListener("click", toggleSound);
+applySoundIcon();
+
+/* ============================================================
+   desktop / mobile detection — coarse layout switch is CSS-driven
+   (media query above); this only adjusts behaviors that CSS can't:
+   hover vs tap reveal of the favorite dot on touch devices.
+   ============================================================ */
+const COARSE = matchMedia("(pointer: coarse)").matches;
+if (COARSE){
+  document.body.addEventListener("touchstart", (e) => {
+    const t = e.target.closest(".tile");
+    $$(".tile.touch-open").forEach(x => { if (x !== t) x.classList.remove("touch-open"); });
+    if (t) t.classList.add("touch-open");
+  }, { passive:true });
+}
+const style = document.createElement("style");
+style.textContent = ".tile.touch-open .fav-dot{opacity:1;transform:scale(1)}";
+document.head.appendChild(style);
+
+/* ============================================================
+   clock (small footer touch, cheap and honest — real local time)
+   ============================================================ */
+function tickClock(){
+  $("#clockOut").textContent = new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+}
+tickClock(); setInterval(tickClock, 30000);
+
+/* ============================================================
+   boot
+   ============================================================ */
+initTheme();
+renderRoute();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncNavThumbs);
+</script>
+</body>
+</html>
