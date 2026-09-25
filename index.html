@@ -86,13 +86,19 @@ img,svg{display:block;max-width:100%}
 }
 :root[data-theme="light"] .topbar{background:rgba(255,255,255,.72);border-color:rgba(10,10,11,.07);
   box-shadow:0 14px 30px rgba(20,15,10,.12)}
-.topbar .links{display:flex;align-items:center;gap:2px;flex:1}
+.topbar .links{position:relative;display:flex;align-items:center;gap:2px;flex:1}
+.nav-thumb{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:var(--r-pill);background:var(--raised);
+  z-index:0;transition:left var(--dur) var(--ease), width var(--dur) var(--ease)}
+.topbar .links a{position:relative;z-index:1}
 .topbar .links a{
   padding:9px 16px;border-radius:var(--r-pill);font-size:14px;font-weight:600;color:var(--ink-3);
   transition:color var(--dur-fast),background var(--dur-fast)
 }
 .topbar .links a:hover{color:var(--ink)}
-.topbar .links a.on{color:var(--ink);background:var(--raised)}
+.topbar .links a.on{color:var(--ink)}
+.searchwrap.mobile-search{max-height:0;opacity:0;overflow:hidden;pointer-events:none;
+  transition:max-height .3s var(--ease), opacity .22s ease}
+.searchwrap.mobile-search.open{max-height:60px;opacity:1;pointer-events:auto}
 .searchwrap{position:relative;width:min(260px,26vw)}
 .searchwrap .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-3)}
 .searchwrap input{
@@ -125,14 +131,16 @@ img,svg{display:block;max-width:100%}
   background:rgba(22,22,24,.72);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
   border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 30px rgba(0,0,0,.4);
 }
+.nav-thumb-b{position:absolute;top:6px;bottom:6px;left:6px;width:0;border-radius:var(--r-pill);
+  background:rgba(224,137,90,.16);z-index:0;transition:left var(--dur) var(--ease), width var(--dur) var(--ease)}
 :root[data-theme="light"] .bottomnav{background:rgba(255,255,255,.82);border-color:rgba(10,10,11,.07);
   box-shadow:0 12px 26px rgba(20,15,10,.14)}
 .bottomnav button{
-  display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:var(--ink-3);
+  position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:var(--ink-3);
   cursor:pointer;font-size:10.5px;font-weight:600;padding:8px 18px;border-radius:var(--r-pill);
-  transition:color var(--dur-fast),background var(--dur-fast)
+  transition:color var(--dur-fast)
 }
-.bottomnav button.on{color:var(--orange-1);background:rgba(224,137,90,.14)}
+.bottomnav button.on{color:var(--orange-1)}
 .bottomnav button .ico{width:21px;height:21px}
 
 @media (max-width: 880px){
@@ -170,24 +178,33 @@ img,svg{display:block;max-width:100%}
 .hero .stat span{font-size:12.5px;color:var(--ink-3)}
 
 /* ============================================================
-   ROWS / SHELVES
+   SECTIONS — block grids, not horizontal scroll rows. Each one
+   fades/rises into place as it enters the viewport, and its tiles
+   stagger in behind it.
    ============================================================ */
-.shelf{padding:26px clamp(18px,4vw,44px) 6px}
-.shelf-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;gap:14px}
-.shelf-head h2{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0;display:flex;align-items:center;gap:9px}
-.shelf-head h2 .ico{width:18px;height:18px;color:var(--orange-1)}
-.shelf-head .count{font-size:12.5px;color:var(--ink-4);font-weight:500}
-.shelf-scroll{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity}
-.shelf-scroll::-webkit-scrollbar{display:none}
+.section{padding:26px clamp(18px,4vw,44px) 10px;opacity:0;transform:translateY(22px);
+  transition:opacity .6s var(--ease), transform .6s var(--ease)}
+.section.in{opacity:1;transform:none}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;gap:14px}
+.section-head h2{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0;display:flex;align-items:center;gap:9px}
+.section-head h2 .ico{width:18px;height:18px;color:var(--orange-1)}
+.section-head .count{font-size:12.5px;color:var(--ink-4);font-weight:500}
+.section-grid{
+  display:grid;gap:16px;
+  grid-template-columns:repeat(auto-fill, minmax(172px, 1fr));
+}
+.section.empty-guard:empty{display:none}
 
 /* ============================================================
    TILE — hover slide/peel effect (from the Canva reference:
    a duplicate offset behind the card, sliding to align on hover)
    ============================================================ */
 .tile{
-  position:relative;flex:0 0 216px;scroll-snap-align:start;cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
+  position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  opacity:0;transform:translateY(16px) scale(.97);
+  transition:opacity .45s var(--ease), transform .45s var(--ease);
 }
+.section.in .tile{opacity:1;transform:none}
 .tile .stackshadow{
   position:absolute;inset:0;border-radius:var(--r-md);background:var(--grad-brand);
   transform:translate(10px,10px);opacity:0;
@@ -201,10 +218,13 @@ img,svg{display:block;max-width:100%}
   display:flex;flex-direction:column;justify-content:flex-end;
 }
 .tile:hover .art, .tile:focus-visible .art{
-  transform:translate(-6px,-6px);border-color:transparent;box-shadow:var(--sh-orange);
+  transform:translate(-6px,-6px) rotate(-0.6deg);border-color:transparent;box-shadow:var(--sh-orange);
 }
 .tile:hover .stackshadow, .tile:focus-visible .stackshadow{opacity:.9;transform:translate(4px,4px)}
-.tile .art .bg{position:absolute;inset:0;z-index:0}
+.tile .art .bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center}
+.tile .art .bg img{width:100%;height:100%;object-fit:cover;display:block;
+  opacity:0;transition:opacity .35s ease}
+.tile .art .bg img.loaded{opacity:1}
 .tile .art .fade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.82) 100%)}
 .tile .art .mark{position:absolute;inset:0;z-index:0;display:grid;place-items:center;font-family:var(--font-display);
   font-size:15px;color:rgba(255,255,255,.16);letter-spacing:.06em;padding:12px;text-align:center;line-height:1.5}
@@ -212,13 +232,21 @@ img,svg{display:block;max-width:100%}
 .tile .art .body b{display:block;font-size:14.5px;font-weight:700;letter-spacing:-.01em;color:#fff;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile .art .body span{font-size:11.5px;color:rgba(255,255,255,.68)}
+.tile .badges{position:absolute;top:9px;left:9px;z-index:3;display:flex;flex-direction:column;gap:5px;align-items:flex-start}
 .tile .badge{
-  position:absolute;top:9px;left:9px;z-index:3;padding:4px 9px;border-radius:var(--r-pill);
-  font-size:10px;font-weight:700;letter-spacing:.03em;color:#1A0800;background:var(--gold)
+  padding:4px 9px;border-radius:var(--r-pill);
+  font-size:9.5px;font-weight:700;letter-spacing:.03em;color:#1A0800;background:var(--gold)
 }
 .tile .badge.up{background:#8FD1FF;color:#052235}
 .tile .badge.new{background:var(--good);color:#052012}
 .tile .badge.sub{background:#fff;color:#1A0800}
+.tile .badge.trend{background:var(--orange-1);color:#2A1206}
+.tile .badge.free{background:#B7E3C7;color:#08331A}
+.tile .badge.sale{background:#E86B6B;color:#390808}
+.tile .badge.mp{background:#C9C2F5;color:#1B1440}
+.tile .badge.ea{background:#D8CFC0;color:#332A18}
+.tile .badge.new, .tile .badge.up{animation:badgeBreathe 2.6s ease-in-out infinite}
+@keyframes badgeBreathe{0%,100%{opacity:1}50%{opacity:.72}}
 .tile .fav-dot{
   position:absolute;top:9px;right:9px;z-index:3;width:26px;height:26px;border-radius:50%;
   background:rgba(0,0,0,.45);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;
@@ -227,8 +255,9 @@ img,svg{display:block;max-width:100%}
 .tile:hover .fav-dot{opacity:1;transform:scale(1)}
 .tile .fav-dot.on{opacity:1;transform:scale(1);color:var(--orange-1)}
 .tile .fav-dot .ico{width:14px;height:14px}
+.tile .fav-dot.pop{animation:favPop .42s var(--ease)}
+@keyframes favPop{0%{transform:scale(1)}40%{transform:scale(1.45)}70%{transform:scale(.88)}100%{transform:scale(1)}}
 
-.shelf.empty-guard:empty{display:none}
 
 /* ============================================================
    DETAIL SCREEN — opens from a tile with a scale/origin transition
@@ -296,6 +325,8 @@ img,svg{display:block;max-width:100%}
 .redirect .spin{width:28px;height:28px;border-radius:50%;border:3px solid rgba(26,8,0,.25);border-top-color:#1A0800;
   margin:16px auto 0;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.icobtn .ico.flip{animation:iconFlip .42s var(--ease)}
+@keyframes iconFlip{0%{transform:rotate(0) scale(1)}50%{transform:rotate(160deg) scale(.5)}100%{transform:rotate(360deg) scale(1)}}
 
 /* ============================================================
    TOAST
@@ -336,6 +367,8 @@ img,svg{display:block;max-width:100%}
 <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6.4" height="6.4" rx="1.6"/><rect x="13.6" y="4" width="6.4" height="6.4" rx="1.6"/><rect x="4" y="13.6" width="6.4" height="6.4" rx="1.6"/><rect x="13.6" y="13.6" width="6.4" height="6.4" rx="1.6"/></symbol>
 <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.6 6.4h14.8M4.6 12h14.8M4.6 17.6h14.8"/></symbol>
 <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 12A8.4 8.4 0 1112 3.6c2.6 0 4.9 1.2 6.4 3"/><path d="M18.4 3v4.6h-4.6M12 7.6V12l3 1.8"/></symbol>
+<symbol id="i-vol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M11 5.2L6.6 9H3.4v6h3.2L11 18.8z"/><path d="M15.4 9.2a4 4 0 010 5.6M18.2 6.4a8 8 0 010 11.2"/></symbol>
+<symbol id="i-vol-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M11 5.2L6.6 9H3.4v6h3.2L11 18.8z"/><path d="M16 9.6l4.6 4.8M20.6 9.6L16 14.4"/></symbol>
 </defs>
 </svg>
 
@@ -353,11 +386,13 @@ img,svg{display:block;max-width:100%}
     <input id="searchInput" placeholder="Search games" autocomplete="off">
   </div>
   <button class="icobtn" id="themeBtn" aria-label="Toggle theme"><svg class="ico"><use href="#i-moon"/></svg></button>
+  <button class="icobtn" id="soundBtn" aria-label="Toggle sound"><svg class="ico"><use href="#i-vol"/></svg></button>
 </header>
 
 <div class="cluster">
   <button class="icobtn" id="clusterHome" aria-label="Home"><svg class="ico"><use href="#i-home"/></svg></button>
   <button class="icobtn" id="clusterTheme" aria-label="Toggle theme"><svg class="ico"><use href="#i-moon"/></svg></button>
+  <button class="icobtn" id="clusterSound" aria-label="Toggle sound"><svg class="ico"><use href="#i-vol"/></svg></button>
   <button class="icobtn" id="clusterSearch" aria-label="Search"><svg class="ico"><use href="#i-search"/></svg></button>
 </div>
 
@@ -429,25 +464,63 @@ img,svg{display:block;max-width:100%}
 "use strict";
 /* ============================================================
    cx — data model
-   Every game is a plain object with boolean flags the shelves
-   are built from. Add a game here and it's automatically routed
-   into whichever shelves its flags match.
+   Every game is a plain object. `image` is a URL (or a data: URI)
+   for real box art — leave it "" to keep the generated gradient
+   mark. NOTE: published cx pages can only load images from a data:
+   URI or the handful of allowed script/font hosts; a normal
+   https:// image URL from a random site will not load here (the
+   page's content security policy blocks remote images), so the
+   tile always falls back to the gradient mark on load failure —
+   nothing ever breaks or shows a broken-image icon.
+
+   Every other property is a plain true/false parameter. Sections
+   further down are generated straight off these booleans — add a
+   new flag to SECTION_DEFS and any game carrying it slots in.
    ============================================================ */
 const GAMES = [
-  { id:"g01", title:"Ridgeline Drift", tagline:"Arcade racing", desc:"Sideways through canyon switchbacks at speeds the car was never rated for. Fourteen tracks, no rubber-banding, no apologies.", url:"https://example.com/ridgeline-drift", tags:["Racing","Arcade"], platforms:["PC","PlayStation","Xbox"], hue:[18,100,54], isPopular:true, isUpcoming:false, isNew:false, isSubscribersOnly:false },
-  { id:"g02", title:"Hollow Signal", tagline:"Sci-fi horror", desc:"A relay station stopped answering six days ago. You're the one they sent to find out why, with a flashlight that's rated for eight hours and a shift that's rated for twelve.", url:"https://example.com/hollow-signal", tags:["Horror","Sci-Fi"], platforms:["PC","PlayStation"], hue:[265,60,42], isPopular:true, isUpcoming:false, isNew:true, isSubscribersOnly:false },
-  { id:"g03", title:"Copper & Rust", tagline:"Base builder", desc:"Strip a dead moon for parts, one refinery at a time, while something in the deep tunnels keeps rearranging the ore you already mapped.", url:"https://example.com/copper-and-rust", tags:["Strategy","Building"], platforms:["PC"], hue:[24,70,48], isPopular:false, isUpcoming:true, isNew:false, isSubscribersOnly:false },
-  { id:"g04", title:"Ninefold Blade", tagline:"Action RPG", desc:"Nine weapons, nine endings, one very short window to figure out which one you're actually holding when the boss doors lock.", url:"https://example.com/ninefold-blade", tags:["RPG","Action"], platforms:["PC","Xbox","Switch"], hue:[0,72,46], isPopular:true, isUpcoming:false, isNew:false, isSubscribersOnly:true },
-  { id:"g05", title:"Undertow", tagline:"Survival co-op", desc:"A flooded coastline, four fishing boats, and a tide that comes in twice as fast as the forecast says it should.", url:"https://example.com/undertow", tags:["Survival","Co-op"], platforms:["PC","PlayStation"], hue:[200,65,40], isPopular:false, isUpcoming:false, isNew:true, isSubscribersOnly:false },
-  { id:"g06", title:"Marrow County", tagline:"Open world", desc:"A county the size of a small state, a truck that starts most mornings, and a rumor about what's actually underneath the quarry.", url:"https://example.com/marrow-county", tags:["Open World","Adventure"], platforms:["PC","Xbox"], hue:[30,55,42], isPopular:true, isUpcoming:false, isNew:false, isSubscribersOnly:false },
-  { id:"g07", title:"Static Choir", tagline:"Puzzle", desc:"Every puzzle is a chord. Get the voicing wrong and the room remembers — literally, the walls redraw around your last mistake.", url:"https://example.com/static-choir", tags:["Puzzle","Music"], platforms:["PC","Switch"], hue:[280,45,52], isPopular:false, isUpcoming:true, isNew:false, isSubscribersOnly:false },
-  { id:"g08", title:"Longshore Kings", tagline:"Sports sim", desc:"Run a dockside fishing league across nine seasons, where your best captain retiring mid-year matters more than any single catch.", url:"https://example.com/longshore-kings", tags:["Sports","Sim"], platforms:["PC","PlayStation","Xbox"], hue:[12,80,50], isPopular:false, isUpcoming:false, isNew:false, isSubscribersOnly:true },
-  { id:"g09", title:"Ashgrove", tagline:"Roguelike deckbuilder", desc:"Every run burns the forest down a little more. Eventually there's nothing left to hide in, which was rather the point.", url:"https://example.com/ashgrove", tags:["Roguelike","Cards"], platforms:["PC","Switch"], hue:[8,68,42], isPopular:true, isUpcoming:false, isNew:false, isSubscribersOnly:false },
-  { id:"g10", title:"Payload Zero", tagline:"Tactical shooter", desc:"Six-person squads, one shared radio channel, and a scoring system that punishes anyone who fires before the countdown hits zero.", url:"https://example.com/payload-zero", tags:["Shooter","Tactical"], platforms:["PC","Xbox"], hue:[210,20,32], isPopular:true, isUpcoming:false, isNew:false, isSubscribersOnly:false },
-  { id:"g11", title:"Paperweight", tagline:"Narrative adventure", desc:"You inherit a dead uncle's apartment and, it turns out, his unfinished argument with everyone in the building.", url:"https://example.com/paperweight", tags:["Narrative","Indie"], platforms:["PC","Switch"], hue:[40,50,50], isPopular:false, isUpcoming:false, isNew:true, isSubscribersOnly:false },
-  { id:"g12", title:"Ironclad Ledger", tagline:"Trading strategy", desc:"Run a merchant fleet through three warring ports without ever technically taking a side — a promise that gets harder every season.", url:"https://example.com/ironclad-ledger", tags:["Strategy","Trading"], platforms:["PC"], hue:[45,60,42], isPopular:false, isUpcoming:true, isNew:false, isSubscribersOnly:true },
-  { id:"g13", title:"Fen & Fable", tagline:"Cozy sim", desc:"A swamp cottage, a leaky roof, and neighbors who are all, technically, folklore made flesh and mildly annoyed about the leak too.", url:"https://example.com/fen-and-fable", tags:["Cozy","Sim"], platforms:["PC","Switch"], hue:[150,40,42], isPopular:false, isUpcoming:false, isNew:true, isSubscribersOnly:false },
-  { id:"g14", title:"Deadhand", tagline:"Western shooter", desc:"A bounty board that updates in real time, a revolver that jams if you clean it wrong, and a town that remembers exactly who you shot.", url:"https://example.com/deadhand", tags:["Western","Shooter"], platforms:["PC","PlayStation"], hue:[22,62,38], isPopular:true, isUpcoming:false, isNew:false, isSubscribersOnly:false }
+  { id:"g01", title:"Ridgeline Drift", tagline:"Arcade racing", desc:"Sideways through canyon switchbacks at speeds the car was never rated for. Fourteen tracks, no rubber-banding, no apologies.", url:"https://example.com/ridgeline-drift", image:"", tags:["Racing","Arcade"], platforms:["PC","PlayStation","Xbox"], hue:[18,100,54],
+    isPopular:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g02", title:"Hollow Signal", tagline:"Sci-fi horror", desc:"A relay station stopped answering six days ago. You're the one they sent to find out why, with a flashlight that's rated for eight hours and a shift that's rated for twelve.", url:"https://example.com/hollow-signal", image:"", tags:["Horror","Sci-Fi"], platforms:["PC","PlayStation"], hue:[265,60,42],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:true },
+  { id:"g03", title:"Copper & Rust", tagline:"Base builder", desc:"Strip a dead moon for parts, one refinery at a time, while something in the deep tunnels keeps rearranging the ore you already mapped.", url:"https://example.com/copper-and-rust", image:"", tags:["Strategy","Building"], platforms:["PC"], hue:[24,70,48],
+    isPopular:false, isTrending:false, isUpcoming:true, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:true, isOnSale:false, isExclusive:false },
+  { id:"g04", title:"Ninefold Blade", tagline:"Action RPG", desc:"Nine weapons, nine endings, one very short window to figure out which one you're actually holding when the boss doors lock.", url:"https://example.com/ninefold-blade", image:"", tags:["RPG","Action"], platforms:["PC","Xbox","Switch"], hue:[0,72,46],
+    isPopular:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:true, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g05", title:"Undertow", tagline:"Survival co-op", desc:"A flooded coastline, four fishing boats, and a tide that comes in twice as fast as the forecast says it should.", url:"https://example.com/undertow", image:"", tags:["Survival","Co-op"], platforms:["PC","PlayStation"], hue:[200,65,40],
+    isPopular:false, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:true, isExclusive:false },
+  { id:"g06", title:"Marrow County", tagline:"Open world", desc:"A county the size of a small state, a truck that starts most mornings, and a rumor about what's actually underneath the quarry.", url:"https://example.com/marrow-county", image:"", tags:["Open World","Adventure"], platforms:["PC","Xbox"], hue:[30,55,42],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g07", title:"Static Choir", tagline:"Puzzle", desc:"Every puzzle is a chord. Get the voicing wrong and the room remembers — literally, the walls redraw around your last mistake.", url:"https://example.com/static-choir", image:"", tags:["Puzzle","Music"], platforms:["PC","Switch"], hue:[280,45,52],
+    isPopular:false, isTrending:true, isUpcoming:true, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g08", title:"Longshore Kings", tagline:"Sports sim", desc:"Run a dockside fishing league across nine seasons, where your best captain retiring mid-year matters more than any single catch.", url:"https://example.com/longshore-kings", image:"", tags:["Sports","Sim"], platforms:["PC","PlayStation","Xbox"], hue:[12,80,50],
+    isPopular:false, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:true, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g09", title:"Ashgrove", tagline:"Roguelike deckbuilder", desc:"Every run burns the forest down a little more. Eventually there's nothing left to hide in, which was rather the point.", url:"https://example.com/ashgrove", image:"", tags:["Roguelike","Cards"], platforms:["PC","Switch"], hue:[8,68,42],
+    isPopular:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:true, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g10", title:"Payload Zero", tagline:"Tactical shooter", desc:"Six-person squads, one shared radio channel, and a scoring system that punishes anyone who fires before the countdown hits zero.", url:"https://example.com/payload-zero", image:"", tags:["Shooter","Tactical"], platforms:["PC","Xbox"], hue:[210,20,32],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:true, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g11", title:"Paperweight", tagline:"Narrative adventure", desc:"You inherit a dead uncle's apartment and, it turns out, his unfinished argument with everyone in the building.", url:"https://example.com/paperweight", image:"", tags:["Narrative","Indie"], platforms:["PC","Switch"], hue:[40,50,50],
+    isPopular:false, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:true },
+  { id:"g12", title:"Ironclad Ledger", tagline:"Trading strategy", desc:"Run a merchant fleet through three warring ports without ever technically taking a side — a promise that gets harder every season.", url:"https://example.com/ironclad-ledger", image:"", tags:["Strategy","Trading"], platforms:["PC"], hue:[45,60,42],
+    isPopular:false, isTrending:false, isUpcoming:true, isNew:false, isSubscribersOnly:true, isFree:false, isMultiplayer:false, isEarlyAccess:true, isOnSale:false, isExclusive:false },
+  { id:"g13", title:"Fen & Fable", tagline:"Cozy sim", desc:"A swamp cottage, a leaky roof, and neighbors who are all, technically, folklore made flesh and mildly annoyed about the leak too.", url:"https://example.com/fen-and-fable", image:"", tags:["Cozy","Sim"], platforms:["PC","Switch"], hue:[150,40,42],
+    isPopular:false, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:true, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"g14", title:"Deadhand", tagline:"Western shooter", desc:"A bounty board that updates in real time, a revolver that jams if you clean it wrong, and a town that remembers exactly who you shot.", url:"https://example.com/deadhand", image:"", tags:["Western","Shooter"], platforms:["PC","PlayStation"], hue:[22,62,38],
+    isPopular:true, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:true, isExclusive:false }
+];
+
+/* Which boolean drives which section, in display order (skipped
+   entirely if zero games currently carry that flag). */
+const SECTION_DEFS = [
+  { key:"isTrending",        title:"Trending now",       icon:"i-flame" },
+  { key:"isPopular",         title:"Popular",             icon:"i-flame" },
+  { key:"isUpcoming",        title:"Up and coming",       icon:"i-clock" },
+  { key:"isNew",             title:"New releases",        icon:"i-new" },
+  { key:"isFree",            title:"Free to play",        icon:"i-grid" },
+  { key:"isMultiplayer",     title:"Multiplayer",         icon:"i-grid" },
+  { key:"isOnSale",          title:"On sale",             icon:"i-flame" },
+  { key:"isEarlyAccess",     title:"Early access",        icon:"i-clock" },
+  { key:"isExclusive",       title:"cx exclusives",       icon:"i-new" },
+  { key:"isSubscribersOnly", title:"Subscribers only",    icon:"i-lock" }
 ];
 
 /* ============================================================
@@ -455,8 +528,8 @@ const GAMES = [
    ============================================================ */
 const STORE_KEY = "cx:state:v1";
 function loadState(){
-  try { return Object.assign({ favorites:[], playlist:[], recent:[], theme:null }, JSON.parse(localStorage.getItem(STORE_KEY) || "{}")); }
-  catch(e){ return { favorites:[], playlist:[], recent:[], theme:null }; }
+  try { return Object.assign({ favorites:[], playlist:[], recent:[], theme:null, muted:false }, JSON.parse(localStorage.getItem(STORE_KEY) || "{}")); }
+  catch(e){ return { favorites:[], playlist:[], recent:[], theme:null, muted:false }; }
 }
 function saveState(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e){} }
 let state = loadState();
@@ -488,22 +561,75 @@ function artGradient(hue){
 }
 function initials(title){ return title.split(" ").map(w=>w[0]).join("").slice(0,3).toUpperCase(); }
 
+/* ============================================================
+   sound — a handful of short synthesized tones, generated on the
+   fly with the Web Audio API. No audio files are loaded (a
+   published page can't fetch remote media anyway), so this never
+   has anything to fail to load. Muted until the first tap/click,
+   per browser autoplay rules, then stays on for the session
+   (toggle lives in localStorage under the same state blob).
+   ============================================================ */
+const Sound = (() => {
+  let ctx = null;
+  function ensure(){ if (!ctx){ try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} } return ctx; }
+  function tone(freq, dur, opts){
+    const o = opts || {};
+    const c = ensure(); if (!c || state.muted) return;
+    if (c.state === "suspended") c.resume();
+    const t0 = c.currentTime;
+    const osc = c.createOscillator(); const gain = c.createGain();
+    osc.type = o.wave || "sine";
+    osc.frequency.setValueAtTime(freq, t0);
+    if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t0 + dur);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(o.vol || 0.09, t0 + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(gain); gain.connect(c.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  }
+  const RECIPES = {
+    nav:      () => tone(520, .09, { wave:"triangle", to:640, vol:.07 }),
+    fav_on:   () => { tone(660, .1, { wave:"sine", to:880, vol:.09 }); setTimeout(()=>tone(990,.08,{wave:"sine",vol:.06}),55); },
+    fav_off:  () => tone(420, .09, { wave:"sine", to:300, vol:.06 }),
+    open:     () => tone(300, .16, { wave:"sine", to:520, vol:.08 }),
+    launch:   () => { tone(340,.14,{wave:"triangle",to:220,vol:.09}); setTimeout(()=>tone(680,.18,{wave:"sine",to:920,vol:.08}),90); },
+    click:    () => tone(700, .05, { wave:"square", vol:.035 })
+  };
+  return { play(name){ const fn = RECIPES[name]; if (fn) fn(); } };
+})();
+function sfx(name){ Sound.play(name); }
+
 function tileNode(game){
   const t = el("article","tile");
   t.tabIndex = 0; t.dataset.id = game.id;
   const shadow = el("div","stackshadow");
   const art = el("div","art");
   const bg = el("div","bg"); bg.style.background = artGradient(game.hue);
+  if (game.image){
+    const img = new Image();
+    img.alt = ""; img.loading = "lazy";
+    img.addEventListener("load", () => img.classList.add("loaded"));
+    img.addEventListener("error", () => img.remove()); // silently falls back to the gradient + mark
+    img.src = game.image;
+    bg.appendChild(img);
+  }
   const mark = el("div","mark", initials(game.title));
   const fade = el("div","fade");
   const body = el("div","body");
   body.append(el("b",null,game.title), el("span",null,game.tagline));
   art.append(bg, mark, fade, body);
 
-  if (game.isNew) art.appendChild(Object.assign(el("span","badge new","New")));
-  else if (game.isUpcoming) art.appendChild(Object.assign(el("span","badge up","Coming soon")));
-  else if (game.isSubscribersOnly) art.appendChild(Object.assign(el("span","badge sub","Subscribers")));
-  else if (game.isPopular) art.appendChild(Object.assign(el("span","badge","Popular")));
+  const badgeDefs = [
+    [game.isNew, "New", "new"], [game.isTrending, "Trending", "trend"],
+    [game.isUpcoming, "Coming soon", "up"], [game.isOnSale, "On sale", "sale"],
+    [game.isFree, "Free", "free"], [game.isMultiplayer, "Multiplayer", "mp"],
+    [game.isEarlyAccess, "Early access", "ea"], [game.isSubscribersOnly, "Subscribers", "sub"]
+  ].filter(b => b[0]).slice(0, 2);
+  if (badgeDefs.length){
+    const stack = el("div","badges");
+    badgeDefs.forEach(([,label,cls]) => stack.appendChild(el("span","badge "+cls,label)));
+    art.appendChild(stack);
+  }
 
   const fav = el("button","fav-dot" + (state.favorites.includes(game.id) ? " on" : ""));
   fav.setAttribute("aria-label","Toggle favorite");
@@ -513,6 +639,8 @@ function tileNode(game){
     const on = toggleSet("favorites", game.id);
     fav.classList.toggle("on", on);
     fav.innerHTML = ""; fav.appendChild(icon(on ? "i-heart-fill" : "i-heart"));
+    fav.classList.remove("pop"); void fav.offsetWidth; fav.classList.add("pop");
+    sfx(on ? "fav_on" : "fav_off");
     toast(on ? "Added to favorites" : "Removed from favorites");
     if (state.route === "favorites") renderRoute();
   });
@@ -523,15 +651,23 @@ function tileNode(game){
   return t;
 }
 
-function shelf(title, iconId, games, opts){
+/* a section is a titled block of tiles laid out in a responsive
+   grid — no horizontal scrolling. Returns null (and is skipped)
+   when there is nothing to put in it. */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add("in"); revealObserver.unobserve(en.target); } });
+}, { threshold: .12 });
+
+function section(title, iconId, games){
   if (!games.length) return null;
-  const wrap = el("section","shelf empty-guard");
-  const head = el("div","shelf-head");
+  const wrap = el("section","section empty-guard");
+  const head = el("div","section-head");
   const h2 = el("h2"); h2.append(icon(iconId), document.createTextNode(title));
   head.append(h2, el("span","count", games.length + " title" + (games.length===1?"":"s")));
-  const scroll = el("div","shelf-scroll");
-  games.forEach(g => scroll.appendChild(tileNode(g)));
-  wrap.append(head, scroll);
+  const grid = el("div","section-grid");
+  games.forEach((g,i) => { const tile = tileNode(g); tile.style.transitionDelay = Math.min(i,8)*35 + "ms"; grid.appendChild(tile); });
+  wrap.append(head, grid);
+  revealObserver.observe(wrap);
   return wrap;
 }
 
@@ -543,47 +679,46 @@ function renderRoute(){
   const rows = $("#rows"); rows.innerHTML = "";
   $$(".hero").forEach(h => h.style.display = state.route === "home" ? "" : "none");
   $$("[data-nav]").forEach(n => n.classList.toggle("on", n.dataset.nav === state.route));
-
-  let query = ($("#activeQuery") || {}).value || "";
-  const pool = query ? GAMES.filter(g => g.title.toLowerCase().includes(query) || g.tags.some(t=>t.toLowerCase().includes(query))) : GAMES;
-
-  if (query){
-    const s = shelf("Results for \u201c" + query + "\u201d", "i-search", pool);
-    rows.appendChild(s || emptyNote("Nothing matches that search."));
-    return;
-  }
+  syncNavThumbs();
 
   if (state.route === "favorites"){
     const games = state.favorites.map(byId).filter(Boolean);
-    rows.appendChild(shelf("Your favorites", "i-heart", games) || emptyNote("No favorites yet. Tap the heart on any tile to add one."));
+    rows.appendChild(section("Your favorites", "i-heart", games) || emptyNote("No favorites yet. Tap the heart on any tile to add one."));
     return;
   }
   if (state.route === "playlist"){
     const games = state.playlist.map(byId).filter(Boolean);
-    rows.appendChild(shelf("Your playlist", "i-list", games) || emptyNote("Your playlist is empty. Open a game and add it from there."));
+    rows.appendChild(section("Your playlist", "i-list", games) || emptyNote("Your playlist is empty. Open a game and add it from there."));
     return;
   }
 
-  // home: recent, favorites, playlist, then category shelves — each hidden if empty
+  // home: recent, favorites, playlist, then every flagged section — each hidden if empty
   const recentGames = state.recent.map(byId).filter(Boolean);
   const favGames = state.favorites.map(byId).filter(Boolean);
   const listGames = state.playlist.map(byId).filter(Boolean);
-  [
-    shelf("Continue playing", "i-history", recentGames),
-    shelf("Your favorites", "i-heart", favGames),
-    shelf("Your playlist", "i-list", listGames),
-    shelf("Popular now", "i-flame", GAMES.filter(g=>g.isPopular)),
-    shelf("Up and coming", "i-clock", GAMES.filter(g=>g.isUpcoming)),
-    shelf("New releases", "i-new", GAMES.filter(g=>g.isNew)),
-    shelf("Subscribers only", "i-lock", GAMES.filter(g=>g.isSubscribersOnly)),
-  ].filter(Boolean).forEach(s => rows.appendChild(s));
-
+  const blocks = [
+    section("Continue playing", "i-history", recentGames),
+    section("Your favorites", "i-heart", favGames),
+    section("Your playlist", "i-list", listGames),
+    ...SECTION_DEFS.map(def => section(def.title, def.icon, GAMES.filter(g => g[def.key])))
+  ];
+  blocks.filter(Boolean).forEach(s => rows.appendChild(s));
   renderHeroStats();
 }
 function emptyNote(msg){
   const p = el("p", null, msg);
   p.style.cssText = "padding:60px clamp(18px,4vw,44px);color:var(--ink-3);font-size:15px;max-width:44ch";
   return p;
+}
+function countUp(node, target){
+  const start = 0, dur = 700, t0 = performance.now();
+  function tick(t){
+    const p = Math.min(1, (t - t0) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    node.textContent = Math.round(start + (target - start) * eased);
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
 function renderHeroStats(){
   const wrap = $("#heroStats"); wrap.innerHTML = "";
@@ -592,41 +727,59 @@ function renderHeroStats(){
     [state.favorites.length, "in your favorites"],
     [state.playlist.length, "in your playlist"]
   ];
-  stats.forEach(([n,l]) => { const d = el("div","stat"); d.append(el("b",null,String(n)), el("span",null,l)); wrap.appendChild(d); });
+  stats.forEach(([n,l]) => {
+    const d = el("div","stat"); const b = el("b",null,"0");
+    d.append(b, el("span",null,l)); wrap.appendChild(d);
+    countUp(b, n);
+  });
 }
 
-function goRoute(r){ state.route = r; const q = $("#searchInput"); if(q) q.value=""; const mq = $("#mobileSearchInput"); if(mq) mq.value=""; renderRoute(); window.scrollTo({top:0,behavior:"smooth"}); }
+function goRoute(r){
+  if (r === state.route) return;
+  sfx("nav");
+  state.route = r;
+  const q = $("#searchInput"); if(q) q.value="";
+  const mq = $("#mobileSearchInput"); if(mq) mq.value="";
+  const rows = $("#rows");
+  rows.style.transition = "opacity .16s ease, transform .16s ease";
+  rows.style.opacity = "0"; rows.style.transform = "translateY(6px)";
+  setTimeout(() => {
+    renderRoute();
+    requestAnimationFrame(() => { rows.style.opacity = "1"; rows.style.transform = "none"; });
+  }, 140);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
 $$("[data-nav]").forEach(n => n.addEventListener("click", (e) => { e.preventDefault(); goRoute(n.dataset.nav); }));
 $("#clusterHome").addEventListener("click", () => goRoute("home"));
+
+function syncNavThumbs(){
+  const onLink = $("#navLinks .on"); const thumb = $("#navThumb");
+  if (onLink && thumb){ thumb.style.left = onLink.offsetLeft + "px"; thumb.style.width = onLink.offsetWidth + "px"; }
+  const onBtn = $(".bottomnav .on"); const thumbB = $("#navThumbB");
+  if (onBtn && thumbB){ thumbB.style.left = onBtn.offsetLeft + "px"; thumbB.style.width = onBtn.offsetWidth + "px"; }
+}
+addEventListener("resize", syncNavThumbs);
 
 /* ============================================================
    search (desktop inline + mobile toggle)
    ============================================================ */
-function runSearch(v){
-  const rows = $("#rows"); rows.innerHTML = "";
-  const q = v.trim().toLowerCase();
-  window.__q = q;
-  $("#activeQuery", document.body) || null;
-  const marker = { value: q };
-  window.__activeQueryValue = q;
-  renderRouteWithQuery(q);
-}
 function renderRouteWithQuery(q){
   const rows = $("#rows"); rows.innerHTML = "";
   if (!q){ renderRoute(); return; }
   $$(".hero").forEach(h => h.style.display = "none");
   const pool = GAMES.filter(g => g.title.toLowerCase().includes(q) || g.tags.some(t=>t.toLowerCase().includes(q)) || g.tagline.toLowerCase().includes(q));
-  const s = shelf("Results for \u201c" + q + "\u201d", "i-search", pool);
+  const s = section("Results for \u201c" + q + "\u201d", "i-search", pool);
   rows.appendChild(s || emptyNote("Nothing matches \u201c" + q + "\u201d."));
 }
 $("#searchInput").addEventListener("input", (e) => renderRouteWithQuery(e.target.value.toLowerCase()));
 $("#mobileSearchInput").addEventListener("input", (e) => renderRouteWithQuery(e.target.value.toLowerCase()));
 $("#clusterSearch").addEventListener("click", () => {
   const w = $("#mobileSearchWrap");
-  const showing = w.style.display !== "none";
-  w.style.display = showing ? "none" : "flex";
-  if (!showing) setTimeout(() => $("#mobileSearchInput").focus(), 60);
-  else runSearch("");
+  const showing = w.classList.contains("open");
+  w.classList.toggle("open", !showing);
+  sfx("nav");
+  if (!showing) setTimeout(() => $("#mobileSearchInput").focus(), 220);
+  else { $("#mobileSearchInput").value = ""; renderRouteWithQuery(""); }
 });
 
 /* ============================================================
@@ -646,8 +799,11 @@ function openDetail(game, tileEl){
   $("#detailTitle").textContent = game.title;
   const badges = $("#detailBadges"); badges.innerHTML = "";
   [
-    [game.isPopular,"Popular","badge"], [game.isUpcoming,"Coming soon","badge up"],
-    [game.isNew,"New","badge new"], [game.isSubscribersOnly,"Subscribers only","badge sub"]
+    [game.isTrending,"Trending","badge trend"], [game.isPopular,"Popular","badge"],
+    [game.isUpcoming,"Coming soon","badge up"], [game.isNew,"New","badge new"],
+    [game.isOnSale,"On sale","badge sale"], [game.isFree,"Free","badge free"],
+    [game.isMultiplayer,"Multiplayer","badge mp"], [game.isEarlyAccess,"Early access","badge ea"],
+    [game.isExclusive,"cx exclusive","badge trend"], [game.isSubscribersOnly,"Subscribers only","badge sub"]
   ].forEach(([cond,label,cls]) => { if(cond){ const b = el("span",cls,label); b.style.position="static"; badges.appendChild(b); } });
 
   const meta = $("#detailMeta"); meta.innerHTML = "";
@@ -663,6 +819,7 @@ function openDetail(game, tileEl){
   d.classList.add("on");
   document.body.style.overflow = "hidden";
   history.pushState({ cx:"detail" }, "", "#" + game.id);
+  sfx("open");
 }
 function syncDetailButtons(){
   const favBtn = $("#detailFav"), listBtn = $("#detailList");
@@ -689,14 +846,16 @@ addEventListener("popstate", () => { if ($("#detail").classList.contains("on")) 
 $("#detailFav").addEventListener("click", () => {
   const on = toggleSet("favorites", currentGame.id);
   syncDetailButtons();
+  sfx(on ? "fav_on" : "fav_off");
   toast(on ? "Added to favorites" : "Removed from favorites");
 });
 $("#detailList").addEventListener("click", () => {
   const on = toggleSet("playlist", currentGame.id);
   syncDetailButtons();
+  sfx(on ? "fav_on" : "fav_off");
   toast(on ? "Added to playlist" : "Removed from playlist");
 });
-$("#detailPlay").addEventListener("click", () => launch(currentGame));
+$("#detailPlay").addEventListener("click", () => { sfx("launch"); launch(currentGame); });
 
 /* ============================================================
    launch / redirect transition
@@ -737,10 +896,23 @@ function initTheme(){
   applyTheme(preferred);
 }
 function toggleTheme(){
+  sfx("nav");
+  $$("#themeBtn .ico, #clusterTheme .ico").forEach(i => { i.classList.remove("flip"); void i.offsetWidth; i.classList.add("flip"); });
   applyTheme((document.documentElement.dataset.theme === "light") ? "dark" : "light");
 }
 $("#themeBtn").addEventListener("click", toggleTheme);
 $("#clusterTheme").addEventListener("click", toggleTheme);
+
+function applySoundIcon(){
+  $$("#soundBtn .ico use, #clusterSound .ico use").forEach(u => u.setAttribute("href", state.muted ? "#i-vol-off" : "#i-vol"));
+}
+function toggleSound(){
+  state.muted = !state.muted; saveState(); applySoundIcon();
+  if (!state.muted) sfx("nav");
+}
+$("#soundBtn").addEventListener("click", toggleSound);
+$("#clusterSound").addEventListener("click", toggleSound);
+applySoundIcon();
 
 /* ============================================================
    desktop / mobile detection — coarse layout switch is CSS-driven
@@ -772,6 +944,7 @@ tickClock(); setInterval(tickClock, 30000);
    ============================================================ */
 initTheme();
 renderRoute();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncNavThumbs);
 </script>
 </body>
 </html>
