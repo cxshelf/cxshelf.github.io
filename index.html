@@ -348,6 +348,7 @@ img,svg{display:block;max-width:100%}
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
 <defs>
+<symbol id="i-verified" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.1 1.5 2.6-.1 1.1 2.4 2.3 1.2-.3 2.6 1.2 2.3-1.2 2.3.3 2.6-2.3 1.2-1.1 2.4-2.6-.1L12 21.5l-2.1-1.5-2.6.1-1.1-2.4-2.3-1.2.3-2.6L3 11.6l1.2-2.3-.3-2.6 2.3-1.2 1.1-2.4 2.6.1L12 2.5zM10.5 15.8l6.1-6.1-1.4-1.4-4.7 4.7-2.2-2.2-1.4 1.4 3.6 3.6z"/></symbol>
 <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.2 20.2l-3.9-3.9"/></symbol>
 <symbol id="i-spark" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.1 6.9L21 11l-6.9 2.1L12 20l-2.1-6.9L3 11l6.9-2.1z"/></symbol>
 <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.9 19.8c.9-3.5 3.7-5.5 7.1-5.5s6.2 2 7.1 5.5"/></symbol>
@@ -479,7 +480,7 @@ img,svg{display:block;max-width:100%}
    ============================================================ */
 const GAMES = [
   { id:"Iconicc-Launcher", title:"Iconicc Launcher", tagline:"Web Minecraft", desc:"Play Minecraft online unblocked.", url:"https://iconicclauncher.github.io/iconicclauncher/", image:"https://i.ibb.co/GyP2bf5/Untitled-design.png", tags:["Open World","Multiplayer"], platforms:["PC","Mobile","iOS"], hue:[18,100,54],
-    isPopular:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+    isPopular:true, isBessa:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
   { id:"Stack", title:"Block Stacker", tagline:"A classic game.", desc:"Stack the blocks to beat your high score.", url:"https://codepen.io/HunorMarton/full/MWjBRWp", image:"https://i.ibb.co/NdfV4khV/Stack.png", tags:["Classic","Timing"], platforms:["PC","Mobile","iOS"], hue:[265,60,42],
     isPopular:true, isTrending:false, isUpcoming:false, isNew:true, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false, isCodepen:true },
   { id:"Menja", title:"Menja", tagline:"Slice it.", desc:"Fruit ninja, but with blocks.", url:"https://menja.cmiller.tech/", image:"https://i.ibb.co/XrqKHstx/8f4a24b081ff1f42.jpg", tags:["Endles","Classic"], platforms:["PC","Mobile","iOS"], hue:[24,70,48],
@@ -512,6 +513,7 @@ const GAMES = [
    entirely if zero games currently carry that flag). */
 const SECTION_DEFS = [
   { key:"isTrending",        title:"Trending now",       icon:"i-flame" },
+   { key:"isBessa",        title:"Made By Bessagoncc",       icon:"i-verified" },
   { key:"isPopular",         title:"Popular",             icon:"i-flame" },
   { key:"isUpcoming",        title:"Up and coming",       icon:"i-clock" },
   { key:"isNew",             title:"New releases",        icon:"i-new" },
