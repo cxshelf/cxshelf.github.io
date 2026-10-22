@@ -1514,7 +1514,8 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncNavThu
   // Firebase config is intentionally a placeholder. Replace it with your project's web app config.
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, addDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
   const firebaseConfig = {
   apiKey: "AIzaSyBvJFkNZmw011M4yHCvxxkHYxObtohf1bM",
@@ -1576,10 +1577,11 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncNavThu
 
   async function initializeFirebase(){
     if (!configReady) { setAuthMessage("Firebase setup needed: add your project's web config in index.html. Local saving still works."); return; }
-    try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app);
+    try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); chatStorage = getStorage(app);
       onAuthStateChanged(auth, async user => {
         currentUser = user || null;
         updateProfileUI(user || null);
+        if(chatRouteMounted) chatSetRoom(activeChatRoom);
         signInBtn.disabled = signUpBtn.disabled = googleBtn.disabled = false;
         if (!user) { setAuthMessage("Not signed in — favorites are saved on this device."); return; }
         try {
@@ -1637,6 +1639,101 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncNavThu
     } catch (err) { submitStatus.textContent="Couldn't send it. Check your connection and Apps Script URL."; console.error(err); }
     finally { button.disabled=false; }
   });
+
+  // Chat rooms use the existing cx-games Firebase project.
+  const CHAT_ADMINS = new Set(["gigasquirreldev@gmail.com","bessa8563@gmail.com"]);
+  let chatStorage = null, chatUnsubscribe = null, activeChatRoom = "chat-1", chatRouteMounted = false;
+  const chatEl = id => document.getElementById(id);
+  const chatRoomInfo = {
+    "chat-1": {title:"chat-1",description:"Anyone can read and send messages."},
+    "chat-2": {title:"chat-2",description:"Sign in to send messages and attach photos."},
+    "system": {title:"system",description:"Everyone can read. Only authorized admins can post."}
+  };
+  function chatNotice(message){ const n=chatEl("chatNotice"); if(n) n.textContent=message; }
+  function chatAdmin(){ return !!currentUser && CHAT_ADMINS.has((currentUser.email||"").toLowerCase()); }
+  function chatEscapeText(parent, tag, className, value){ const n=document.createElement(tag); if(className)n.className=className; n.textContent=value||""; parent.appendChild(n); return n; }
+  function chatRenderMessages(snapshot){
+    const list=chatEl("chatMessages"); if(!list)return;
+    list.innerHTML="";
+    if(snapshot.empty){ chatEscapeText(list,"div","chat-empty","No messages yet. Start the conversation."); return; }
+    snapshot.forEach(docSnap=>{
+      const m=docSnap.data()||{}, row=chatEscapeText(list,"article","chat-message","");
+      if(m.photoURL){ const img=document.createElement("img");img.className="chat-pfp";img.src=m.photoURL;img.alt="";img.loading="lazy";row.appendChild(img); }
+      else { const p=chatEscapeText(row,"div","chat-pfp",(m.username||"U").trim().slice(0,1).toUpperCase()); p.setAttribute("aria-hidden","true"); }
+      const main=chatEscapeText(row,"div","chat-message-main","");
+      const meta=chatEscapeText(main,"div","chat-message-meta","");
+      chatEscapeText(meta,"span","chat-message-name",m.username||"Guest");
+      chatEscapeText(meta,"span","chat-message-email",m.email?("(" + m.email + ")"):"(no email)");
+      const stamp=m.createdAt?.toDate ? m.createdAt.toDate() : null;
+      if(stamp) chatEscapeText(meta,"span","chat-message-time",stamp.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}));
+      if(m.text) chatEscapeText(main,"div","chat-message-text",m.text);
+      if(m.attachmentURL){const img=document.createElement("img");img.className="chat-attachment";img.src=m.attachmentURL;img.alt="Photo attachment";img.loading="lazy";img.addEventListener("click",()=>window.open(m.attachmentURL,"_blank","noopener"));main.appendChild(img);}
+    });
+    list.scrollTop=list.scrollHeight;
+  }
+  function chatSetRoom(room){
+    if(!chatRoomInfo[room])return;
+    activeChatRoom=room;
+    if(chatUnsubscribe){chatUnsubscribe();chatUnsubscribe=null;}
+    const title=chatEl("chatRoomTitle"), description=chatEl("chatRoomDescription"), compose=chatEl("chatCompose"), guestFields=chatEl("chatGuestFields"), upload=chatEl("chatUploadLabel"), input=chatEl("chatMessageInput"), send=chatEl("chatSendButton"), file=chatEl("chatPhotoFile");
+    if(!compose||!input)return;
+    if(title)title.textContent=chatRoomInfo[room].title;
+    if(description)description.textContent=chatRoomInfo[room].description;
+    if(guestFields)guestFields.hidden=room!=="chat-1";
+    if(upload)upload.hidden=room!=="chat-2";
+    if(file)file.value="";
+    input.placeholder=room==="system"?"System announcements are read-only for most users…":room==="chat-2"?"Message chat-2…":"Write a message…";
+    const permitted=room==="chat-1" || (room==="chat-2" && !!currentUser) || (room==="system" && chatAdmin());
+    input.disabled=!permitted; if(send)send.disabled=!permitted;
+    if(upload)upload.style.opacity=currentUser?"1":".4";
+    if(!db){chatNotice("Firebase is not connected. Chat needs the cx-games Firestore setup.");return;}
+    chatNotice(room==="chat-1"?"Open room · posting does not require an account":room==="chat-2"?(currentUser?"Signed in · photo uploads enabled":"Sign in from the Profile tab to post and upload photos"):(chatAdmin()?"Admin posting enabled":"Read-only system announcements"));
+    try{
+      const q=query(collection(db,"chats",room,"messages"),orderBy("createdAt","asc"),limit(150));
+      chatUnsubscribe=onSnapshot(q,chatRenderMessages,error=>{console.error(error);chatNotice("Could not load messages. Check Firestore chat rules and connection.");});
+    }catch(e){console.error(e);chatNotice("Chat setup error. Check Firestore rules.");}
+  }
+  async function chatSendMessage(event){
+    event.preventDefault();
+    const input=chatEl("chatMessageInput"), send=chatEl("chatSendButton"), text=(input?.value||"").trim(), room=activeChatRoom;
+    if(!db||!text){if(!text)chatNotice("Write a message first.");return;}
+    if(room==="chat-2"&&!currentUser){chatNotice("Sign in to send messages in chat-2.");return;}
+    if(room==="system"&&!chatAdmin()){chatNotice("Only the two authorized system admins can post.");return;}
+    const guestName=(chatEl("chatGuestName")?.value||"").trim(), guestEmail=(chatEl("chatGuestEmail")?.value||"").trim();
+    const username=room==="chat-1"?(guestName||(currentUser?.displayName)||"Guest"):(currentUser?.displayName||currentUser?.email?.split("@")[0]||"User");
+    const email=room==="chat-1"?(guestEmail||(currentUser?.email)||""):(currentUser?.email||"");
+    const file=room==="chat-2"?chatEl("chatPhotoFile")?.files?.[0]:null;
+    if(file && (!file.type.startsWith("image/") || file.size>5*1024*1024)){chatNotice("Choose an image smaller than 5 MB.");return;}
+    if(send)send.disabled=true;
+    chatNotice(file?"Uploading photo…":"Sending…");
+    try{
+      let attachmentURL="";
+      if(file){
+        if(!chatStorage)throw new Error("Firebase Storage did not initialize.");
+        const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-90);
+        const fileRef=storageRef(chatStorage,"chat-2/"+currentUser.uid+"/"+Date.now()+"_"+safeName);
+        await uploadBytes(fileRef,file,{contentType:file.type});
+        attachmentURL=await getDownloadURL(fileRef);
+      }
+      await addDoc(collection(db,"chats",room,"messages"),{
+        username:username.slice(0,48),email:email.slice(0,160),text:text.slice(0,1500),
+        uid:currentUser?.uid||null,photoURL:currentUser?.photoURL||"",attachmentURL,
+        createdAt:serverTimestamp()
+      });
+      input.value="";if(file)chatEl("chatPhotoFile").value="";
+      chatNotice("Message sent.");
+    }catch(e){console.error(e);chatNotice(e.code==="permission-denied"?"Firebase denied this message. Deploy the chat Firestore rules from chat-security.md.":"Couldn't send message. Check Firebase chat rules and Storage setup.");}
+    finally{if(send)send.disabled=!(room==="chat-1"||(room==="chat-2"&&!!currentUser)||(room==="system"&&chatAdmin()));}
+  }
+  window.addEventListener("cx:chat-route",event=>{
+    chatRouteMounted=true;
+    const room=event.detail?.room||"chat-1";
+    const form=chatEl("chatCompose");
+    if(form&&!form.dataset.bound){form.dataset.bound="1";form.addEventListener("submit",chatSendMessage);}
+    chatSetRoom(room);
+  });
+  window.addEventListener("cx:chat-room",event=>chatSetRoom(event.detail?.room||"chat-1"));
+
   initializeFirebase();
 </script>
 
