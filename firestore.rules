@@ -4,6 +4,46 @@ service cloud.firestore {
     match /users/{userId}/private/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+    // Chat rooms: messages are readable by everyone, but posting is room-specific.
+    function validChatFields() {
+      return request.resource.data.keys().hasAll(['username','email','text','uid','photoURL','attachmentURL','createdAt'])
+        && request.resource.data.keys().hasOnly(['username','email','text','uid','photoURL','attachmentURL','createdAt'])
+        && request.resource.data.username is string
+        && request.resource.data.username.size() > 0
+        && request.resource.data.username.size() <= 48
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 160
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 1500
+        && request.resource.data.photoURL is string
+        && request.resource.data.photoURL.size() <= 2048
+        && request.resource.data.attachmentURL is string
+        && request.resource.data.attachmentURL.size() <= 2048
+        && request.resource.data.createdAt == request.time;
+    }
+    function chatAdmin() {
+      return request.auth != null
+        && request.auth.token.email in ['gigasquirreldev@gmail.com', 'bessa8563@gmail.com'];
+    }
+    match /chats/{room}/messages/{messageId} {
+      allow read: if room in ['chat-1', 'chat-2', 'system'];
+      allow create: if validChatFields() && (
+        (room == 'chat-1'
+          && request.resource.data.attachmentURL == ''
+          && (request.resource.data.uid == null
+            || (request.auth != null && request.resource.data.uid == request.auth.uid)))
+        || (room == 'chat-2'
+          && request.auth != null
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.email == request.auth.token.email)
+        || (room == 'system'
+          && chatAdmin()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.email == request.auth.token.email
+          && request.resource.data.attachmentURL == '')
+      );
+      allow update, delete: if false;
+    }
     // No public access to arbitrary documents.
     match /{document=**} {
       allow read, write: if false;
