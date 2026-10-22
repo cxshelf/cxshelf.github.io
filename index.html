@@ -442,6 +442,13 @@ img,svg{display:block;max-width:100%}
 .runner-player.full-window.bar-hidden .runner-player-frame-wrap{height:100vh;height:100dvh}
 @media(max-width:700px){.runner-player-bar{gap:8px}.runner-player-actions{gap:5px}.runner-mode-select{min-width:118px;max-width:140px}.runner-player.full-window .runner-player-bar,.runner-player:fullscreen .runner-player-bar,.runner-player.fullscreen-fallback .runner-player-bar{padding:8px}}
 
+
+/* Community chats */
+.chat-page{padding:26px clamp(16px,4vw,44px) 100px;max-width:1250px;margin:0 auto;color:var(--ink)}
+.chat-page-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}.chat-page-head h1{font-size:clamp(32px,5vw,48px);letter-spacing:-1.8px;margin:0}.chat-eyebrow{font-size:10px;letter-spacing:2px;color:var(--orange-1);font-weight:800;margin:0 0 7px}.chat-subtitle{color:var(--ink-3);margin:8px 0 0;font-size:14px}
+.chat-layout{display:grid;grid-template-columns:225px minmax(0,1fr);gap:16px;min-height:520px}.chat-room-list,.chat-room-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}.chat-room-list{padding:9px;display:flex;flex-direction:column;gap:6px}.chat-room{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid transparent;background:transparent;color:var(--ink);border-radius:14px;padding:12px;cursor:pointer;font:inherit}.chat-room.active{background:var(--raised);border-color:var(--line-2)}.chat-room-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--surface-2);color:var(--orange-1);font-size:11px;font-weight:800;flex:none}.chat-room b,.chat-room small{display:block}.chat-room b{font-size:13px}.chat-room small{font-size:10px;color:var(--ink-3);margin-top:4px}
+.chat-room-panel{display:flex;flex-direction:column;min-height:520px}.chat-room-heading{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--line)}.chat-room-heading h2{font-size:20px;margin:0;letter-spacing:-.4px}.chat-room-heading p{font-size:12px;color:var(--ink-3);margin:5px 0 0}.chat-live-dot{font-size:10px;color:var(--good);border:1px solid #3ddc8440;background:#3ddc8410;border-radius:99px;padding:6px 9px}.chat-notice{padding:10px 20px;font-size:12px;color:var(--ink-3);border-bottom:1px solid var(--line)}.chat-notice:empty{display:none}.chat-messages{display:flex;flex-direction:column;gap:12px;padding:20px;flex:1;min-height:240px;max-height:480px;overflow-y:auto}.chat-empty{margin:auto;color:var(--ink-3);font-size:13px;text-align:center;padding:36px 12px}.chat-message{display:flex;align-items:flex-start;gap:10px;max-width:100%}.chat-pfp{width:36px;height:36px;border-radius:50%;object-fit:cover;flex:none;background:var(--raised);border:1px solid var(--line-2);display:grid;place-items:center;color:var(--ink-3);font-size:12px;font-weight:800}.chat-message-main{min-width:0;max-width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:4px 15px 15px 15px;padding:10px 13px}.chat-message-meta{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-bottom:5px}.chat-message-name{font-size:12px;font-weight:800;color:var(--ink)}.chat-message-email{font-size:10px;color:var(--ink-3);overflow-wrap:anywhere}.chat-message-time{font-size:9px;color:var(--ink-4);margin-left:auto}.chat-message-text{font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}.chat-attachment{display:block;max-width:min(360px,100%);max-height:280px;object-fit:contain;border-radius:10px;margin-top:9px;border:1px solid var(--line)}.chat-compose{padding:14px;border-top:1px solid var(--line);display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap}.chat-guest-fields{display:flex;gap:8px;width:100%}.chat-guest-fields input,.chat-compose textarea{min-width:0;background:var(--bg-2);color:var(--ink);border:1px solid var(--line-2);border-radius:12px;padding:11px 12px;font:inherit;font-size:12px;outline:none}.chat-guest-fields input{width:50%}.chat-compose textarea{flex:1;resize:vertical;min-height:44px;max-height:120px}.chat-guest-fields input:focus,.chat-compose textarea:focus{border-color:var(--orange-1)}.chat-send{min-height:44px;padding:0 20px}.chat-upload{display:flex;align-items:center;gap:6px;padding:10px 12px;border:1px solid var(--line-2);border-radius:12px;color:var(--ink-2);font-size:11px;cursor:pointer}.chat-upload .ico{width:15px;height:15px}.chat-footnote{padding:0 18px 15px;margin:0;color:var(--ink-4);font-size:10px}.chat-compose [disabled]{opacity:.5;cursor:not-allowed}
+@media(max-width:700px){.chat-page{padding:18px 12px 100px}.chat-layout{grid-template-columns:1fr;gap:10px}.chat-room-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:6px;gap:4px}.chat-room{padding:9px 6px;gap:6px;flex-direction:column;text-align:center}.chat-room-icon{width:30px;height:30px;border-radius:9px}.chat-room small{font-size:9px}.chat-room b{font-size:11px}.chat-room-panel{min-height:60vh}.chat-messages{padding:13px;max-height:52vh}.chat-room-heading{padding:15px}.chat-compose{padding:10px}.chat-send{padding:0 15px}.chat-guest-fields{flex-direction:column}.chat-guest-fields input{width:100%;box-sizing:border-box}.chat-message-time{display:none}}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-N8SR4WLDPE"></script>
@@ -507,6 +514,7 @@ img,svg{display:block;max-width:100%}
     <a href="#" data-nav="all">All</a>
     <a href="#" data-nav="favorites">Favorites</a>
     <a href="#" data-nav="playlist">Playlist</a>
+    <a href="#" data-nav="chats">Chat</a>
   </nav>
   <div class="searchwrap">
     <svg class="ico"><use href="#i-search"/></svg>
@@ -593,6 +601,7 @@ img,svg{display:block;max-width:100%}
   <button data-nav="all"><svg class="ico"><use href="#i-search"/></svg>All</button>
   <button data-nav="favorites"><svg class="ico"><use href="#i-heart"/></svg>Favorites</button>
   <button data-nav="playlist"><svg class="ico"><use href="#i-list"/></svg>Playlist</button>
+  <button data-nav="chats"><svg class="ico"><use href="#i-chat"/></svg>Chat</button>
   <button data-nav="account" id="mobileAccountNav" aria-label="Sign in or profile"><span class="nav-avatar-wrap"><svg class="ico" id="mobileAccountIcon"><use href="#i-user"/></svg><img class="nav-avatar" id="mobileProfilePhoto" alt="" hidden></span><span id="mobileAccountLabel">Sign in</span></button>
 </nav>
 
@@ -1013,6 +1022,7 @@ function renderRoute(){
   syncNavThumbs();
 
   if (state.route === "account"){ renderHeroStats(); return; }
+  if (state.route === "chats"){ renderChatRoute(rows); return; }
   if (state.route === "favorites"){
     const games = state.favorites.map(byId).filter(Boolean);
     rows.appendChild(section("Your favorites", "i-heart", games) || emptyNote("No favorites yet. Tap the heart on any tile to add one."));
@@ -1061,6 +1071,11 @@ function renderRoute(){
   ];
   blocks.filter(Boolean).forEach(s => rows.appendChild(s));
   renderHeroStats();
+}
+function renderChatRoute(rows){
+  rows.innerHTML = `<section class="chat-page"><header class="chat-page-head"><div><p class="chat-eyebrow">CXSHELF COMMUNITY</p><h1>Chats</h1><p class="chat-subtitle">Three rooms, different posting permissions.</p></div></header><div class="chat-layout"><aside class="chat-room-list"><button class="chat-room active" data-chat-room="chat-1"><span class="chat-room-icon">01</span><span><b>chat-1</b><small>Open to everyone</small></span></button><button class="chat-room" data-chat-room="chat-2"><span class="chat-room-icon">02</span><span><b>chat-2</b><small>Account + photo uploads</small></span></button><button class="chat-room" data-chat-room="system"><span class="chat-room-icon">SYS</span><span><b>system</b><small>Public read · approved senders</small></span></button></aside><section class="chat-room-panel"><div class="chat-room-heading"><div><h2 id="chatRoomTitle">chat-1</h2><p id="chatRoomDescription">Anyone can read and send messages.</p></div><span class="chat-live-dot">Live</span></div><div id="chatNotice" class="chat-notice" role="status">Connecting to chat…</div><div id="chatMessages" class="chat-messages" aria-live="polite"></div><form id="chatCompose" class="chat-compose"><div id="chatGuestFields" class="chat-guest-fields"><input id="chatGuestName" maxlength="48" placeholder="Username" aria-label="Username" autocomplete="nickname"><input id="chatGuestEmail" maxlength="160" type="email" placeholder="Email (optional)" aria-label="Email (optional)" autocomplete="email"></div><label id="chatUploadLabel" class="chat-upload" hidden title="Attach a photo"><svg class="ico"><use href="#i-plus"/></svg><input id="chatPhotoFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden><span>Photo</span></label><textarea id="chatMessageInput" maxlength="1500" rows="2" placeholder="Write a message…" aria-label="Message" required></textarea><button class="btn play chat-send" id="chatSendButton" type="submit">Send</button></form><p class="chat-footnote">Be respectful. Messages are public in their room.</p></section></div></section>`;
+  rows.querySelectorAll("[data-chat-room]").forEach(btn=>btn.addEventListener("click",()=>{rows.querySelectorAll("[data-chat-room]").forEach(b=>b.classList.toggle("active",b===btn));window.dispatchEvent(new CustomEvent("cx:chat-room",{detail:{room:btn.dataset.chatRoom}}));}));
+  window.dispatchEvent(new CustomEvent("cx:chat-route",{detail:{room:"chat-1"}}));
 }
 function emptyNote(msg){
   const p = el("p", null, msg);
